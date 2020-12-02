@@ -1,0 +1,23 @@
+## Interface: 11305
+## Title: GoogleSheetDKP
+## Notes: Simple interface for using DKP with a google sheet
+## Author: dieck
+## Version: alpha1
+## SavedVariables: GoogleSheetDKPDB
+
+
+embeds.xml
+
+googlesheetdkp.lua
+globalutils.lua
+
+output-enUS.lua
+locale-enUS.lua
+
+output-deDE.lua
+locale-deDE.lua
+
+gui.lua
+dkp.lua
+core.lua
+
