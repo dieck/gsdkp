@@ -110,14 +110,19 @@ end
 
 -- add history entry for all raid members
 function GoogleSheetDKP:RaidChange(change, cause, comment)
+	if GetNumGroupMembers() == 0 then GoogleSheetDKP:Print("Not in a group.") end
 	for i = 1, GetNumGroupMembers() do
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-		GoogleSheetDKP:Change(name, change, cause, comment)
+		-- silent Change
+		GoogleSheetDKP:Change(name, change, cause, comment, true)
 	end
+	chg = "DKP change for the whole raid: " .. change .. " for " .. cause
+	if comment then chg = chg .. " / " .. comment end
+	SendChatMessage(chg, "RAID")
 end
 
 -- add single history entry
-function GoogleSheetDKP:Change(name, change, cause, comment)
+function GoogleSheetDKP:Change(name, change, cause, comment, silent)
 
 	-- enable Chat Log for these actions
 	local isLogging = LoggingChat()
@@ -135,7 +140,7 @@ function GoogleSheetDKP:Change(name, change, cause, comment)
 		if GoogleSheetDKP.db.profile.create_new_users then
 			GoogleSheetDKP.db.profile.current[name] = 0
 			GoogleSheetDKP:Print("New user " .. name .. " added.")
-			GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation")
+			GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", silent)
 		else
 			GoogleSheetDKP:Print("User " .. name .. " unknown and new user creation is not allowed.")
 			return nil
@@ -173,10 +178,11 @@ function GoogleSheetDKP:Change(name, change, cause, comment)
 		
 	GoogleSheetDKP:Print(hist)
 	
-	if GoogleSheetDKP.db.profile.output_raid then
+	
+	if not silent and GoogleSheetDKP.db.profile.output_raid then
 		SendChatMessage(hist, "RAID")
 	end
-	if GoogleSheetDKP.db.profile.output_user then
+	if not silent and GoogleSheetDKP.db.profile.output_user then
 		SendChatMessage(hist, "WHISPER", nil, name)
 	end
 	
@@ -229,3 +235,7 @@ function GoogleSheetDKP:CHAT_MSG_WHISPER(event, text, sender)
 	end
 	
 end
+
+
+
+
