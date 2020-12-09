@@ -74,8 +74,11 @@ function GoogleSheetDKP:Export()
 		s = s .. h["name"] .. "\t"
 		s = s .. h["change"] .. "\t"
 		s = s .. h["cause"] .. "\t"
-		s = s .. h["comment"]
-	
+		if h["comment"] == nil then	
+			s = s .. "-"
+		else
+			s = s .. h["comment"]
+		end
 		r = r .. s .. "\r\n"
 	end
 
@@ -99,6 +102,11 @@ end
 
 -- add history entry for an Item
 function GoogleSheetDKP:Item(name, change, itemLink)
+	if itemLink == nil then
+		GoogleSheetDKP:Debug("No Itemlink given for item dkp")
+		return nil 
+	end
+	
 	-- itemLink looks like |cff9d9d9d|Hitem:3299::::::::20:257::::::|h[Fractured Canine]|h|r
 	local id = itemLink:match("|Hitem:(%d+):")
 	if id then
