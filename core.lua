@@ -268,6 +268,9 @@ function GoogleSheetDKP:ChatCommand(inc)
 			local _, name, change, item = strsplit(" ", incs, 4)
 			GoogleSheetDKP:Item(name, change, item)
 			
+		elseif cmd == "init" or cmd == "raidinit" then
+			GoogleSheetDKP:RaidInit()
+
 		elseif cmd == "raid" or cmd == "raidchange" then
 			local _, change, cause, comment = strsplit(" ", incs, 4)
 			GoogleSheetDKP:RaidChange(change, cause, comment)

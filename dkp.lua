@@ -119,8 +119,15 @@ end
 -- add history entry for all raid members
 function GoogleSheetDKP:RaidChange(change, cause, comment)
 	if GetNumGroupMembers() == 0 then GoogleSheetDKP:Print("Not in a group.") end
+	local names = {}
+	
 	for i = 1, GetNumGroupMembers() do
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+		table.insert(names, name)
+	end
+	-- alphabetical order
+	table.sort(names)
+	for i,name in ipairs(names) do	
 		-- silent Change
 		GoogleSheetDKP:Change(name, change, cause, comment, true)
 	end
@@ -128,6 +135,29 @@ function GoogleSheetDKP:RaidChange(change, cause, comment)
 	if comment then chg = chg .. " / " .. comment end
 	SendChatMessage(chg, "RAID")
 end
+
+-- add initial DKP for new players
+function GoogleSheetDKP:RaidInit()
+	if GetNumGroupMembers() == 0 then GoogleSheetDKP:Print("Not in a group.") end
+	local names = {}
+	for i = 1, GetNumGroupMembers() do
+		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+		if GoogleSheetDKP.db.profile.current[name] == nil then
+			table.insert(names, name)
+		end
+	end
+	-- alphabetical order
+	table.sort(names)
+	for i,name in ipairs(names) do
+		GoogleSheetDKP.db.profile.current[name] = 0
+		GoogleSheetDKP:Print("New user " .. name .. " added.")
+		-- silent Change
+		GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", true)
+	end
+	chg = "Initialized new characters in raid with Start DKP (" .. GoogleSheetDKP.db.profile.create_new_dkp .. "DKP): " .. table.concat(names, ", ")
+	SendChatMessage(chg, "RAID")
+end
+
 
 -- add single history entry
 function GoogleSheetDKP:Change(name, change, cause, comment, silent)
