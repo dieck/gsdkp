@@ -110,15 +110,19 @@ function GoogleSheetDKP:Item(name, change, itemLink)
 	-- itemLink looks like |cff9d9d9d|Hitem:3299::::::::20:257::::::|h[Fractured Canine]|h|r
 	local id = itemLink:match("|Hitem:(%d+):")
 	if id then
-		GoogleSheetDKP:Change(name, change, "Item", id .. ": " .. itemLink)
+		return GoogleSheetDKP:Change(name, change, "Item", id .. ": " .. itemLink)
 	else
 		GoogleSheetDKP:Debug("Could not identify Item ID")
+		return nil
 	end
 end
 
 -- add history entry for all raid members
 function GoogleSheetDKP:RaidChange(change, cause, comment)
-	if GetNumGroupMembers() == 0 then GoogleSheetDKP:Print("Not in a group.") end
+	if GetNumGroupMembers() == 0 then 
+		GoogleSheetDKP:Print("Not in a group.") 
+		return nil
+	end
 	local names = {}
 	
 	for i = 1, GetNumGroupMembers() do
@@ -127,18 +131,24 @@ function GoogleSheetDKP:RaidChange(change, cause, comment)
 	end
 	-- alphabetical order
 	table.sort(names)
+	local changes = true
 	for i,name in ipairs(names) do	
 		-- silent Change
-		GoogleSheetDKP:Change(name, change, cause, comment, true)
+		local change = GoogleSheetDKP:Change(name, change, cause, comment, true)
+		changes = changes and change
 	end
 	chg = "DKP change for the whole raid: " .. change .. " for " .. cause
 	if comment then chg = chg .. " / " .. comment end
 	SendChatMessage(chg, "RAID")
+	return changes
 end
 
 -- add initial DKP for new players
 function GoogleSheetDKP:RaidInit()
-	if GetNumGroupMembers() == 0 then GoogleSheetDKP:Print("Not in a group.") end
+	if GetNumGroupMembers() == 0 then 
+		GoogleSheetDKP:Print("Not in a group.") 
+		return nil
+	end
 	local names = {}
 	for i = 1, GetNumGroupMembers() do
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
@@ -148,24 +158,25 @@ function GoogleSheetDKP:RaidInit()
 	end
 	-- alphabetical order
 	table.sort(names)
+	local changes = true
 	for i,name in ipairs(names) do
 		GoogleSheetDKP.db.profile.current[name] = 0
 		GoogleSheetDKP:Print("New user " .. name .. " added.")
 		-- silent Change
-		GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", true)
+		local change = GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", true)
+		changes = changes and change
 	end
 	chg = "Initialized new characters in raid with Start DKP (" .. GoogleSheetDKP.db.profile.create_new_dkp .. "DKP): " .. table.concat(names, ", ")
 	SendChatMessage(chg, "RAID")
+	return changes
 end
 
 
 -- add single history entry
 function GoogleSheetDKP:Change(name, change, cause, comment, silent)
-
 	-- enable Chat Log for these actions
 	local isLogging = LoggingChat()
 	if GoogleSheetDKP.db.profile.chatlog and not isLogging then LoggingChat(1) end
-
 
 	if name == nil then
 		GoogleSheetDKP:Debug("No user given for Change request")
@@ -190,7 +201,6 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent)
 		GoogleSheetDKP:Debug("No cause given for Change request")
 		return nil
 	end
-
 
 	if change == nil or not tonumber(change) then
 		GoogleSheetDKP:Debug("Could not determine value for DKP change")
@@ -231,7 +241,8 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent)
 		GoogleSheetDKP:CancelTimer(GoogleSheetDKP.reminderTimer)
 	end
 	GoogleSheetDKP.reminderTimer = GoogleSheetDKP:ScheduleTimer("ReloadReminder", 180)	
-	
+
+	return true
 end
 
 function GoogleSheetDKP:GetDKP(name)

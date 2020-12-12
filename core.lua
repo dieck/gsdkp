@@ -11,7 +11,7 @@ local defaults = {
 	outputlanguage = GetLocale(),
 	negative_allowed = false,
 	create_new_users = true,
-	create_new_dkp = 0,
+	create_new_dkp = 100,
   }
 }
 
@@ -190,17 +190,21 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				n05 = { order=05, type="description", name="Usage:" },
 				n06 = { order=06, type="description", name="/gsdkp: opens overview GUI" },
 				n07 = { order=07, type="description", name="/gsdkp config: opens configuration view with Import/Export/Help" },
-				n08 = { order=08, type="description", name="/gsdkp change NAME VALUE CAUSE [COMMENT]: commits manual DKP change" },
-				n09 = { order=09, type="description", name="/gsdkp item NAME VALUE ITEMLINK: commits manual DKP change for Item awards. Value will *not* be negated! (Use e.g. -10 for costs)" },
-				n10 = { order=10, type="description", name="/gsdkp raidchange VALUE CAUSE [COMMENT]: commits DKP change to all current raid members" },
-				n11 = { order=11, type="description", name="Please note: CAUSE can only be a single word, e.g. 'Item', 'Bonus', 'Participation', 'FirstKill'" },
-				n12 = { order=12, type="description", name="" },
-				n13 = { order=13, type="description", name="API:" },
-				n14 = { order=14, type="description", name="Google Sheet DKP can be used by other addons to manage DKP:" },
-				n15 = { order=15, type="description", name="GoogleSheetDKP:GetDKP(name)" },
-				n16 = { order=16, type="description", name="GoogleSheetDKP:Change(name, value, cause, comment)" },
-				n17 = { order=17, type="description", name="GoogleSheetDKP:RaidChange(value, cause, comment)" },
-				n18 = { order=18, type="description", name="GoogleSheetDKP:Item(name, value, itemLink)" },
+				n08 = { order=08, type="description", name="/gsdkp action: opens action menu for simplified usage of the next options:" },
+				n09 = { order=09, type="description", name="" },
+				n10 = { order=10, type="description", name="/gsdkp change NAME VALUE CAUSE [COMMENT]: commits manual DKP change" },
+				n11 = { order=11, type="description", name="/gsdkp item NAME VALUE ITEMLINK: commits manual DKP change for Item awards. Value will *not* be negated! (Use e.g. -10 for costs)" },
+				n12 = { order=12, type="description", name="/gsdkp raidchange VALUE CAUSE [COMMENT]: commits DKP change to all current raid members (also /gsdkp raid)" },
+				n12 = { order=12, type="description", name="/gsdkp raidinit VALUE CAUSE [COMMENT]: commits DKP change to all current raid members (also /gsdkp init)" },
+				n13 = { order=13, type="description", name="Please note: CAUSE can only be a single word, e.g. 'Item', 'Bonus', 'Participation', 'FirstKill'" },
+				n14 = { order=14, type="description", name="" },
+				n15 = { order=15, type="description", name="API:" },
+				n16 = { order=16, type="description", name="Google Sheet DKP can be used by other addons to manage DKP:" },
+				n17 = { order=17, type="description", name="GoogleSheetDKP:GetDKP(name)" },
+				n18 = { order=18, type="description", name="GoogleSheetDKP:Change(name, value, cause, comment)" },
+				n19 = { order=19, type="description", name="GoogleSheetDKP:RaidChange(value, cause, comment)" },
+				n20 = { order=20, type="description", name="GoogleSheetDKP:RaidInit()" },
+				n21 = { order=21, type="description", name="GoogleSheetDKP:Item(name, value, itemLink)" },
 			}
 		},
 		
@@ -264,6 +268,10 @@ function GoogleSheetDKP:ChatCommand(inc)
 		if cmd == nil then 
 			-- do nothing
 			return nil
+
+		elseif cmd == "action" then
+			GoogleSheetDKP.actionframe = GoogleSheetDKP:createActionFrame()
+
 		elseif cmd == "item" then
 			local _, name, change, item = strsplit(" ", incs, 4)
 			GoogleSheetDKP:Item(name, change, item)
