@@ -50,6 +50,14 @@ Configuration options including Import, Export and Help
 commits manual DKP changs, Item DKP changes or changes for the whole Raid.
 For Items, please note value will *not* be negated! (use e.g. -10 for costs)
 
+  /gsdkp attendance
+  /gsdkp attendance delete
+
+takes raid attendance, will be used on next raidchange, if not deleted before that
+
+  
+
+
 ## Notification
 
 The addon can notify Raid and/or players (by whisper) about changes, to be transparent while handling DKP.

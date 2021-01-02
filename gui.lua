@@ -220,6 +220,7 @@ function GoogleSheetDKP:createActionFrame()
 		{ value = "change", text = "change" }, 
 		{ value = "raidchange", text = "raidchange" },
 		{ value = "raidinit", text = "raidinit" }, 
+		{ value = "attendance", text = "attendance" }, 
 	})
 	tabGroup:SetCallback("OnGroupSelected", function(widget, event, group) GoogleSheetDKP:ActionFrameTabChange(widget, event, group) end)
 	tabGroup:SelectTab("item")
@@ -234,6 +235,7 @@ local actionFrameUser = ""
 local actionFrameDKP = 0
 local actionFrameCause = ""
 local actionFrameComment = ""
+local actionFrameDeletion = false
 
 function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
     container:ReleaseChildren()
@@ -242,8 +244,22 @@ function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
 	s:SetLayout("Flow") -- probably?
 	container:AddChild(s)
 
+	if group == "attendance" then
+		actionFrameAction = group
+		children = GoogleSheetDKP:ActionFrameTab_attendance()
+		s:AddChild(children["lbHeader"])
+		s:AddChild(children["lbAlt1"])
+		s:AddChild(children["lbAlt2"])
+		s:AddChild(children["cbDeletion"])
+		s:AddChild(children["btExecute"])
+		return s
+	end
+	-- "else"
+	
+	
 	children = GoogleSheetDKP:ActionFrameTab_master()
 	children["btExecute"]:SetText("Execute " .. group .. " action")
+	
 	actionFrameAction = group
 
     if group == "item" then
@@ -313,6 +329,46 @@ function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
 	s:AddChild(children["btExecute"])
 end
 
+
+function GoogleSheetDKP:ActionFrameTab_attendance(container)
+	local children = {}
+		
+	local lbHeader = AceGUI:Create("Heading")
+	lbHeader:SetText("/gsdkp attendance ['delete']")
+	lbHeader:SetRelativeWidth(1.0)
+	children["lbHeader"] = lbHeader
+
+	local lbAlt1 = AceGUI:Create("Label")
+	lbAlt1:SetText("Alternative: /gsdkp attend ['delete']")
+	lbAlt1:SetRelativeWidth(1.0)
+	children["lbAlt1"] = lbAlt1
+
+	local lbAlt2 = AceGUI:Create("Label")
+	lbAlt2:SetText("API: GoogleSheetDKP:Attendance(['delete'])")
+	lbAlt2:SetRelativeWidth(1.0)
+	children["lbAlt2"] = lbAlt2
+
+	local cbDeletion = AceGUI:Create("CheckBox")
+	cbDeletion:SetType("checkbox")
+	cbDeletion:SetValue(actionFrameDeletion)
+	cbDeletion:SetLabel("delete")
+	cbDeletion:SetRelativeWidth(1.0)
+	cbDeletion:SetCallback("OnValueChanged", function(widget, event, value)
+		actionFrameDeletion = widget:GetValue()
+	end)
+	children["cbDeletion"] = cbDeletion
+	
+	local btExecute = AceGUI:Create("Button")
+	btExecute:SetText("Execute Action")
+	btExecute:SetRelativeWidth(1.0)
+	btExecute:SetCallback("OnClick", function()
+		GoogleSheetDKP:executeActionFrameAction()
+	end)
+	children["btExecute"] = btExecute	
+
+	return children
+end
+
 function GoogleSheetDKP:ActionFrameTab_master(container)
 	local children = {}
 		
@@ -369,7 +425,7 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 	ddChar:SetText(raiderlist[preselect])
 	ddChar:SetLabel("Character")
 	ddChar:SetRelativeWidth(0.5)
-	ddChar:SetCallback("OnValueChanged", function(widget, key)
+	ddChar:SetCallback("OnValueChanged", function(widget, event, key)
 		if key ~= "manual_select" then
 			actionFrameUser = key
 			widget.edChar:SetText(actionFrameUser)
@@ -471,6 +527,12 @@ function GoogleSheetDKP:executeActionFrameAction()
 		res = GoogleSheetDKP:RaidChange(actionFrameDKP, actionFrameCause, actionFrameComment)
 	elseif actionFrameAction == 'item' then
 		res = GoogleSheetDKP:Item(actionFrameUser, actionFrameDKP, actionFrameComment)
+	elseif actionFrameAction == 'attendance' then
+		if actionFrameDelete then 
+			res = GoogleSheetDKP:Attendance("delete")
+		else
+			res = GoogleSheetDKP:Attendance()
+		end
 	else --elseif actionFrameAction == 'change' then
 		res = GoogleSheetDKP:Change(actionFrameUser, actionFrameDKP, actionFrameCause, actionFrameComment)
 	end

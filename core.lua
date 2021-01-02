@@ -198,13 +198,17 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				n12 = { order=12, type="description", name="/gsdkp raidinit VALUE CAUSE [COMMENT]: commits DKP change to all current raid members (also /gsdkp init)" },
 				n13 = { order=13, type="description", name="Please note: CAUSE can only be a single word, e.g. 'Item', 'Bonus', 'Participation', 'FirstKill'" },
 				n14 = { order=14, type="description", name="" },
-				n15 = { order=15, type="description", name="API:" },
-				n16 = { order=16, type="description", name="Google Sheet DKP can be used by other addons to manage DKP:" },
-				n17 = { order=17, type="description", name="GoogleSheetDKP:GetDKP(name)" },
-				n18 = { order=18, type="description", name="GoogleSheetDKP:Change(name, value, cause, comment)" },
-				n19 = { order=19, type="description", name="GoogleSheetDKP:RaidChange(value, cause, comment)" },
-				n20 = { order=20, type="description", name="GoogleSheetDKP:RaidInit()" },
-				n21 = { order=21, type="description", name="GoogleSheetDKP:Item(name, value, itemLink)" },
+				n15 = { order=15, type="description", name="/gsdkp raidattendance: takes raid attendance to be used for next raidchange" },
+				n16 = { order=16, type="description", name="/gsdkp raidattendance delete: deletes stored raid attendance" },
+				n17 = { order=17, type="description", name="" },
+				n18 = { order=18, type="description", name="API:" },
+				n19 = { order=19, type="description", name="Google Sheet DKP can be used by other addons to manage DKP:" },
+				n20 = { order=20, type="description", name="GoogleSheetDKP:GetDKP(name)" },
+				n21 = { order=21, type="description", name="GoogleSheetDKP:Change(name, value, cause, comment)" },
+				n22 = { order=22, type="description", name="GoogleSheetDKP:RaidChange(value, cause, comment)" },
+				n23 = { order=23, type="description", name="GoogleSheetDKP:RaidInit()" },
+				n24 = { order=24, type="description", name="GoogleSheetDKP:Item(name, value, itemLink)" },
+				n25 = { order=25, type="description", name="GoogleSheetDKP:RaidAttendance(['delete'])" },
 			}
 		},
 		
@@ -282,6 +286,10 @@ function GoogleSheetDKP:ChatCommand(inc)
 		elseif cmd == "raid" or cmd == "raidchange" then
 			local _, change, cause, comment = strsplit(" ", incs, 4)
 			GoogleSheetDKP:RaidChange(change, cause, comment)
+
+		elseif cmd == "attendance" or cmd == "attend" then
+			local _, deletion = strsplit(" ", incs, 2)
+			GoogleSheetDKP:Attendance(deletion)
 			
 		elseif cmd == "change" then
 			local _, name, change, cause, comment = strsplit(" ", incs, 5)

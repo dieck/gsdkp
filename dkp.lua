@@ -117,12 +117,19 @@ function GoogleSheetDKP:Item(name, change, itemLink)
 	end
 end
 
--- add history entry for all raid members
-function GoogleSheetDKP:RaidChange(change, cause, comment)
+-- takes raid attendance, can be used later on for raidchange
+function GoogleSheetDKP:Attendance(deletion)
 	if GetNumGroupMembers() == 0 then 
 		GoogleSheetDKP:Print("Not in a group.") 
 		return nil
 	end
+	
+	if deletion ~= nil and deletion == "delete" then
+		GoogleSheetDKP:Print("Removed raid attendance list") 
+		GoogleSheetDKP.db.profile.raidattendance = nil
+		return nil
+	end
+	
 	local names = {}
 	
 	for i = 1, GetNumGroupMembers() do
@@ -131,8 +138,26 @@ function GoogleSheetDKP:RaidChange(change, cause, comment)
 	end
 	-- alphabetical order
 	table.sort(names)
+	
+	GoogleSheetDKP.db.profile.raidattendance = names
+end
+
+-- add history entry for all raid members
+function GoogleSheetDKP:RaidChange(change, cause, comment)
+	
+	-- if raid attendance was not taken yet, take it now
+	if GoogleSheetDKP.db.profile.raidattendance == nil then
+		GoogleSheetDKP:Attendance()
+	end
+	
+	-- still no raid attendance? then we're obviously not in a raid right now
+	if GoogleSheetDKP.db.profile.raidattendance == nil then
+		-- RaidAttendance already printed "Not in a group"
+		return nil
+	end
+	
 	local changes = true
-	for i,name in ipairs(names) do	
+	for i,name in ipairs(GoogleSheetDKP.db.profile.raidattendance) do	
 		-- silent Change
 		local change = GoogleSheetDKP:Change(name, change, cause, comment, true)
 		changes = changes and change
@@ -140,6 +165,10 @@ function GoogleSheetDKP:RaidChange(change, cause, comment)
 	chg = "DKP change for the whole raid: " .. change .. " for " .. cause
 	if comment then chg = chg .. " / " .. comment end
 	SendChatMessage(chg, "RAID")
+	
+	-- delete raidattendance (only used once)
+	GoogleSheetDKP.db.profile.raidattendance = nil
+	
 	return changes
 end
 
