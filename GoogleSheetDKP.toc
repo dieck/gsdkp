@@ -19,5 +19,6 @@ locale-deDE.lua
 
 gui.lua
 dkp.lua
+yesno.lua
 core.lua
 

@@ -12,6 +12,7 @@ local defaults = {
 	negative_allowed = false,
 	create_new_users = true,
 	create_new_dkp = 100,
+	remind_attendance = yes,
   }
 }
 
@@ -128,6 +129,15 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline331 = { name="", type="description", order=331 },
 				note332 = { name="Capture Chat log for easier resolve of disputes and discussions about DKP after a raid", type="description", order=332 },
 			
+				attendance = {
+					name = "Attendence reminder",
+					desc = "Remind to store attendance for later Raid DKP assignment",
+					type = "toggle",
+					order = 340,
+					set = function(info,val) GoogleSheetDKP.db.profile.remind_attendance = val end,
+					get = function(info) return GoogleSheetDKP.db.profile.remind_attendance end,
+				},
+				newline341 = { name="", type="description", order=341 },
 			},
 		},
 		
@@ -246,6 +256,17 @@ function GoogleSheetDKP:OnInitialize()
   if GoogleSheetDKP.db.profile.history == nil then GoogleSheetDKP.db.profile.history = {} end
   if GoogleSheetDKP.db.profile.current == nil then GoogleSheetDKP.db.profile.current = {} end
   
+  -- for "later" option, will be compared against time()
+  self.attendancereminder = 0
+  
+  if self.db.profile.raidattendance_taken == nil then self.db.profile.raidattendance_taken = 0 end
+  
+  -- remove stored attendance if older than 12 hours
+  if self.db.profile.raidattendance_taken + 12*60*60 < time() then
+	self.db.profile.raidattendance = nil
+	self.db.profile.raidattendance_taken = 0
+  end
+  
 end
 
 function GoogleSheetDKP:OnEnable()
@@ -261,9 +282,12 @@ function GoogleSheetDKP:ChatCommand(inc)
 
 	if strtrim(inc) == "config" or strtrim(inc) == "conf" then
 		LibStub("AceConfigDialog-3.0"):Open("GoogleSheetDKP")
-		return nil
+		return true
+		
 	elseif strtrim(inc) == "" then
 		GoogleSheetDKP.dkpframe = GoogleSheetDKP:createDKPFrame()
+		return true
+		
 	else
 		-- condense multiple spaces
 		local incs = string.gsub(strtrim(inc), "%s%s+", " ")
@@ -271,34 +295,41 @@ function GoogleSheetDKP:ChatCommand(inc)
 				
 		if cmd == nil then 
 			-- do nothing
-			return nil
+			return false
 
 		elseif cmd == "action" then
 			GoogleSheetDKP.actionframe = GoogleSheetDKP:createActionFrame()
+			return true
 
 		elseif cmd == "item" then
 			local _, name, change, item = strsplit(" ", incs, 4)
 			GoogleSheetDKP:Item(name, change, item)
+			return true
 			
 		elseif cmd == "init" or cmd == "raidinit" then
 			GoogleSheetDKP:RaidInit()
+			return true
 
 		elseif cmd == "raid" or cmd == "raidchange" then
 			local _, change, cause, comment = strsplit(" ", incs, 4)
 			GoogleSheetDKP:RaidChange(change, cause, comment)
+			return true
 
 		elseif cmd == "attendance" or cmd == "attend" then
 			local _, deletion = strsplit(" ", incs, 2)
 			GoogleSheetDKP:Attendance(deletion)
+			return true
 			
 		elseif cmd == "change" then
 			local _, name, change, cause, comment = strsplit(" ", incs, 5)
 			GoogleSheetDKP:Change(name, change, cause, comment)		
+			return true
 		
 		end
 
 	end
-	
+
+	return false
 end
 
 

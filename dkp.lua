@@ -117,6 +117,57 @@ function GoogleSheetDKP:Item(name, change, itemLink)
 	end
 end
 
+
+-- copy table content (normal assignment will only do a pointer)
+local function tcopy(src) 
+	local dest = {}
+	for idx, val in pairs(src) do
+		if type(val) == "table" then
+			dest[idx] = tcopy(val)
+		else
+			dest[idx] = val
+		end
+	end
+	return dest
+end
+
+
+-- find latest entry for an item in history
+function GoogleSheetDKP:FindLastItem(itemLink)
+	if itemLink == nil then
+		GoogleSheetDKP:Debug("No Itemlink given for requesting last item")
+		return nil 
+	end
+	
+	local id = itemLink:match("|Hitem:(%d+):")
+	if id then
+		local search = id .. ": " .. itemLink
+		local maxid = 0
+		local maxhist = nil
+		
+		for hnum,h in pairsByKeys(GoogleSheetDKP.db.profile.history) do
+			
+			if h.comment == search then
+			
+				if tonumber(maxid) < tonumber(hnum) then
+					maxid = tonumber(hnum)
+					maxhist = tcopy(h)
+				end
+				
+			end
+			
+		end
+
+		if maxid > 0 then
+			return  maxhist
+		end
+		
+	end
+	
+	-- no item found
+	return nil
+end
+
 -- takes raid attendance, can be used later on for raidchange
 function GoogleSheetDKP:Attendance(deletion)
 	if GetNumGroupMembers() == 0 then 
@@ -140,6 +191,7 @@ function GoogleSheetDKP:Attendance(deletion)
 	table.sort(names)
 	
 	GoogleSheetDKP.db.profile.raidattendance = names
+	GoogleSheetDKP.db.profile.raidattendance_taken = time()
 end
 
 -- add history entry for all raid members
@@ -270,6 +322,8 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent)
 		GoogleSheetDKP:CancelTimer(GoogleSheetDKP.reminderTimer)
 	end
 	GoogleSheetDKP.reminderTimer = GoogleSheetDKP:ScheduleTimer("ReloadReminder", 180)	
+
+	GoogleSheetDKP:askToTakeAttendance()
 
 	return true
 end
