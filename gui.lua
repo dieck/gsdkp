@@ -350,7 +350,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	children["lbAlt2"] = lbAlt2
 	
 	local edAttendance = AceGUI:Create("MultiLineEditBox")
-	local textAttendance = table.concat(GoogleSheetDKP.db.profile.raidattendance, "\n") or ""
+	local textAttendance = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
 	edAttendance:SetText(textAttendance)
 	edAttendance:SetLabel("Attendance")
 	edAttendance:SetRelativeWidth(1.0)
@@ -372,7 +372,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	btExecute:SetRelativeWidth(1.0)
 	btExecute:SetCallback("OnClick", function()
 		GoogleSheetDKP:executeActionFrameAction()
-		local newText = table.concat(GoogleSheetDKP.db.profile.raidattendance, "\n") or ""
+		local newText = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
 		edAttendance:SetText(newText)
 	end)
 	children["btExecute"] = btExecute	
@@ -539,7 +539,7 @@ function GoogleSheetDKP:executeActionFrameAction()
 	elseif actionFrameAction == 'item' then
 		res = GoogleSheetDKP:Item(actionFrameUser, actionFrameDKP, actionFrameComment)
 	elseif actionFrameAction == 'attendance' then
-		if actionFrameDelete then 
+		if actionFrameDeletion then
 			res = GoogleSheetDKP:Attendance("delete")
 		else
 			res = GoogleSheetDKP:Attendance()
