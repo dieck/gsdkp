@@ -236,6 +236,8 @@ local actionFrameDKP = 0
 local actionFrameCause = ""
 local actionFrameComment = ""
 local actionFrameDeletion = false
+local actionFrameOverride = false
+local manualAttendanceText = ""
 
 function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
     container:ReleaseChildren()
@@ -250,7 +252,10 @@ function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
 		s:AddChild(children["lbHeader"])
 		s:AddChild(children["lbAlt1"])
 		s:AddChild(children["lbAlt2"])
+		s:AddChild(children["edAttendance"])
 		s:AddChild(children["cbDeletion"])
+		s:AddChild(children["cbOverride"])
+		s:AddChild(children["lbSpacer"])
 		s:AddChild(children["btExecute"])
 		return s
 	end
@@ -347,22 +352,61 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	lbAlt2:SetText("API: GoogleSheetDKP:Attendance(['delete'])")
 	lbAlt2:SetRelativeWidth(1.0)
 	children["lbAlt2"] = lbAlt2
+	
+	local edAttendance = AceGUI:Create("MultiLineEditBox")
+	manualAttendanceText = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
+	edAttendance:SetText(manualAttendanceText)
+	edAttendance:SetLabel("Attendance")
+	edAttendance:SetRelativeWidth(1.0)
+	edAttendance:SetNumLines(10)
+	edAttendance:SetDisabled(not actionFrameOverride)
+	children["edAttendance"] = edAttendance
+	
+	local cbDeletion
+	local cbOverride
 
-	local cbDeletion = AceGUI:Create("CheckBox")
+	cbDeletion = AceGUI:Create("CheckBox")
 	cbDeletion:SetType("checkbox")
 	cbDeletion:SetValue(actionFrameDeletion)
 	cbDeletion:SetLabel("delete")
 	cbDeletion:SetRelativeWidth(1.0)
 	cbDeletion:SetCallback("OnValueChanged", function(widget, event, value)
 		actionFrameDeletion = widget:GetValue()
+		if actionFrameDeletion then 
+			cbOverride:SetValue(false)
+			actionFrameOverride = false
+		end
+		edAttendance:SetDisabled(not actionFrameOverride)
 	end)
 	children["cbDeletion"] = cbDeletion
+	
+	cbOverride = AceGUI:Create("CheckBox")
+	cbOverride:SetType("checkbox")
+	cbOverride:SetValue(actionFrameOverride)
+	cbOverride:SetLabel("override")
+	cbOverride:SetRelativeWidth(1.0)
+	cbOverride:SetCallback("OnValueChanged", function(widget, event, value)
+		actionFrameOverride = widget:GetValue()
+		if actionFrameOverride then 
+			cbDeletion:SetValue(false)
+			actionFrameDeletion = false
+		end
+		edAttendance:SetDisabled(not actionFrameOverride)
+	end)
+	children["cbOverride"] = cbOverride
+	
+	local lbSpacer = AceGUI:Create("Heading")
+	lbSpacer:SetRelativeWidth(1.0)
+	children["lbSpacer"] = lbSpacer
 	
 	local btExecute = AceGUI:Create("Button")
 	btExecute:SetText("Execute Action")
 	btExecute:SetRelativeWidth(1.0)
 	btExecute:SetCallback("OnClick", function()
+		manualAttendanceText = edAttendance:GetText()
 		GoogleSheetDKP:executeActionFrameAction()
+		manualAttendanceText = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
+		edAttendance:SetText(manualAttendanceText)
 	end)
 	children["btExecute"] = btExecute	
 
@@ -528,8 +572,10 @@ function GoogleSheetDKP:executeActionFrameAction()
 	elseif actionFrameAction == 'item' then
 		res = GoogleSheetDKP:Item(actionFrameUser, actionFrameDKP, actionFrameComment)
 	elseif actionFrameAction == 'attendance' then
-		if actionFrameDelete then 
+		if actionFrameDeletion then
 			res = GoogleSheetDKP:Attendance("delete")
+		elseif actionFrameOverride then
+			res = GoogleSheetDKP:Attendance("override", manualAttendanceText)
 		else
 			res = GoogleSheetDKP:Attendance()
 		end

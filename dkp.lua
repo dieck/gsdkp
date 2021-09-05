@@ -169,29 +169,43 @@ function GoogleSheetDKP:FindLastItem(itemLink)
 end
 
 -- takes raid attendance, can be used later on for raidchange
-function GoogleSheetDKP:Attendance(deletion)
+function GoogleSheetDKP:Attendance(command, parameter)
 	if GetNumGroupMembers() == 0 then 
 		GoogleSheetDKP:Print("Not in a group.") 
 		return nil
 	end
 	
-	if deletion ~= nil and deletion == "delete" then
+	local names = {}
+	local numMembers = 0
+	
+	if command ~= nil and command == "delete" then
 		GoogleSheetDKP:Print("Removed raid attendance list") 
 		GoogleSheetDKP.db.profile.raidattendance = nil
 		return nil
+	elseif command ~= nil and command == "override" then
+		-- GoogleSheetDKP:Print("Manual attendance override")		
+		if not parameter or parameter == "" then
+			GoogleSheetDKP:Print("Empty override list!")
+			return nil
+		end
+		
+		names = { strsplit("\n", parameter) }
+		for x in pairs(names) do numMembers = numMembers + 1 end
+		GoogleSheetDKP:Print("Manual member list (" .. numMembers .. " members):\n" .. parameter)
+	else
+		for i = 1, GetNumGroupMembers() do
+			local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
+			table.insert(names, name)
+			numMembers = numMembers + 1
+		end
 	end
 	
-	local names = {}
-	
-	for i = 1, GetNumGroupMembers() do
-		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-		table.insert(names, name)
-	end
 	-- alphabetical order
 	table.sort(names)
 	
 	GoogleSheetDKP.db.profile.raidattendance = names
 	GoogleSheetDKP.db.profile.raidattendance_taken = time()
+	GoogleSheetDKP:Print("New attendance list saved (" .. numMembers .. " members)")
 end
 
 -- add history entry for all raid members
