@@ -182,16 +182,19 @@ function GoogleSheetDKP:Attendance(deletion)
 	end
 	
 	local names = {}
+	local numMembers = 0
 	
 	for i = 1, GetNumGroupMembers() do
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
 		table.insert(names, name)
+		numMembers = numMembers + 1
 	end
 	-- alphabetical order
 	table.sort(names)
 	
 	GoogleSheetDKP.db.profile.raidattendance = names
 	GoogleSheetDKP.db.profile.raidattendance_taken = time()
+	GoogleSheetDKP:Print("New attendance list saved (" .. numMembers .. " members)")
 end
 
 -- add history entry for all raid members
