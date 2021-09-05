@@ -250,6 +250,7 @@ function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
 		s:AddChild(children["lbHeader"])
 		s:AddChild(children["lbAlt1"])
 		s:AddChild(children["lbAlt2"])
+		s:AddChild(children["edAttendance"])
 		s:AddChild(children["cbDeletion"])
 		s:AddChild(children["btExecute"])
 		return s
@@ -347,6 +348,14 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	lbAlt2:SetText("API: GoogleSheetDKP:Attendance(['delete'])")
 	lbAlt2:SetRelativeWidth(1.0)
 	children["lbAlt2"] = lbAlt2
+	
+	local edAttendance = AceGUI:Create("MultiLineEditBox")
+	local textAttendance = table.concat(GoogleSheetDKP.db.profile.raidattendance, "\n") or ""
+	edAttendance:SetText(textAttendance)
+	edAttendance:SetLabel("Attendance")
+	edAttendance:SetRelativeWidth(1.0)
+	edAttendance:SetNumLines(10)
+	children["edAttendance"] = edAttendance
 
 	local cbDeletion = AceGUI:Create("CheckBox")
 	cbDeletion:SetType("checkbox")
@@ -363,6 +372,8 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	btExecute:SetRelativeWidth(1.0)
 	btExecute:SetCallback("OnClick", function()
 		GoogleSheetDKP:executeActionFrameAction()
+		local newText = table.concat(GoogleSheetDKP.db.profile.raidattendance, "\n") or ""
+		edAttendance:SetText(newText)
 	end)
 	children["btExecute"] = btExecute	
 
