@@ -359,6 +359,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	edAttendance:SetLabel("Attendance")
 	edAttendance:SetRelativeWidth(1.0)
 	edAttendance:SetNumLines(10)
+	edAttendance:SetDisabled(not actionFrameOverride)
 	children["edAttendance"] = edAttendance
 	
 	local cbDeletion
@@ -375,6 +376,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 			cbOverride:SetValue(false)
 			actionFrameOverride = false
 		end
+		edAttendance:SetDisabled(not actionFrameOverride)
 	end)
 	children["cbDeletion"] = cbDeletion
 	
@@ -389,6 +391,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 			cbDeletion:SetValue(false)
 			actionFrameDeletion = false
 		end
+		edAttendance:SetDisabled(not actionFrameOverride)
 	end)
 	children["cbOverride"] = cbOverride
 	
