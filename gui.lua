@@ -237,6 +237,7 @@ local actionFrameCause = ""
 local actionFrameComment = ""
 local actionFrameDeletion = false
 local actionFrameOverride = false
+local manualAttendanceText = ""
 
 function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
     container:ReleaseChildren()
@@ -353,8 +354,8 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	children["lbAlt2"] = lbAlt2
 	
 	local edAttendance = AceGUI:Create("MultiLineEditBox")
-	local textAttendance = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
-	edAttendance:SetText(textAttendance)
+	manualAttendanceText = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
+	edAttendance:SetText(manualAttendanceText)
 	edAttendance:SetLabel("Attendance")
 	edAttendance:SetRelativeWidth(1.0)
 	edAttendance:SetNumLines(10)
@@ -372,6 +373,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 		actionFrameDeletion = widget:GetValue()
 		if actionFrameDeletion then 
 			cbOverride:SetValue(false)
+			actionFrameOverride = false
 		end
 	end)
 	children["cbDeletion"] = cbDeletion
@@ -385,6 +387,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 		actionFrameOverride = widget:GetValue()
 		if actionFrameOverride then 
 			cbDeletion:SetValue(false)
+			actionFrameDeletion = false
 		end
 	end)
 	children["cbOverride"] = cbOverride
@@ -397,9 +400,10 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	btExecute:SetText("Execute Action")
 	btExecute:SetRelativeWidth(1.0)
 	btExecute:SetCallback("OnClick", function()
+		manualAttendanceText = edAttendance:GetText()
 		GoogleSheetDKP:executeActionFrameAction()
-		local newText = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
-		edAttendance:SetText(newText)
+		manualAttendanceText = table.concat(GoogleSheetDKP.db.profile.raidattendance or {}, "\n") or ""
+		edAttendance:SetText(manualAttendanceText)
 	end)
 	children["btExecute"] = btExecute	
 
@@ -567,6 +571,8 @@ function GoogleSheetDKP:executeActionFrameAction()
 	elseif actionFrameAction == 'attendance' then
 		if actionFrameDeletion then
 			res = GoogleSheetDKP:Attendance("delete")
+		elseif actionFrameOverride then
+			res = GoogleSheetDKP:Attendance("override", manualAttendanceText)
 		else
 			res = GoogleSheetDKP:Attendance()
 		end
