@@ -1,3 +1,5 @@
+package-as: GoogleSheetDKP
+
 externals:
   libs/LibStub:
     url: https://repos.wowace.com/wow/libstub/trunk
@@ -32,3 +34,14 @@ externals:
   libs/AceTimer-3.0:
     url: https://repos.wowace.com/wow/ace3/trunk/AceTimer-3.0
     tag: latest
+  libs/AceComm-3.0:
+    url: https://repos.wowace.com/wow/ace3/trunk/AceComm-3.0
+    tag: latest
+  libs/AceSerializer-3.0:
+    url: https://repos.wowace.com/wow/ace3/trunk/AceSerializer-3.0
+    tag: latest
+  libs/LibDeformat-3.0
+    url: https://repos.wowace.com/wow/libdeformat-3-0
+
+ignore:
+  - .pkgmeta
