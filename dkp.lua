@@ -34,6 +34,7 @@ function GoogleSheetDKP:Import(info, value)
 				GoogleSheetDKP.db.profile.nexthistory = tonumber(hnum)+1
 			end
 			GoogleSheetDKP:Debug("Next History entry will be " .. GoogleSheetDKP.db.profile.nexthistory)
+			GoogleSheetDKP.db.profile.historytimestamp = time()
 
 		else
 			-- handle all following lines as content
@@ -45,6 +46,8 @@ function GoogleSheetDKP:Import(info, value)
 
 	end
 
+	GoogleSheetDKP.db.profile.backups = {}
+	GoogleSheetDKP:sendSyncOffer()
 end
 
 
@@ -216,6 +219,7 @@ function GoogleSheetDKP:RaidChange(change, cause, comment)
 	end
 	local chg = "DKP change for the whole raid: " .. change .. " for " .. cause
 	if comment then chg = chg .. " / " .. comment end
+
 	SendChatMessage(chg, "RAID")
 
 	-- delete raidattendance (only used once)
@@ -254,7 +258,7 @@ end
 
 
 -- add single history entry
-function GoogleSheetDKP:Change(name, change, cause, comment, silent)
+function GoogleSheetDKP:Change(name, change, cause, comment, silent, dt, tm, commSender)
 	-- enable Chat Log for these actions
 	local isLogging = LoggingChat()
 	if GoogleSheetDKP.db.profile.chatlog and not isLogging then LoggingChat(1) end
@@ -270,7 +274,7 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent)
 		if GoogleSheetDKP.db.profile.create_new_users then
 			GoogleSheetDKP.db.profile.current[name] = 0
 			GoogleSheetDKP:Print("New user " .. name .. " added.")
-			GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", silent)
+			GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", silent, commSender)
 		else
 			GoogleSheetDKP:Print("User " .. name .. " unknown and new user creation is not allowed.")
 			return nil
@@ -288,14 +292,19 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent)
 		return nil
 	end
 
-	GoogleSheetDKP.db.profile.history[GoogleSheetDKP.db.profile.nexthistory] = {
+	local newhistory = {
 		name = name,
 		date = date("%d.%m.%Y"),
 		time = date("%H:%M:%S"),
 		change = change,
 		cause = cause,
-		comment = comment
+		comment = comment,
+		silent = silent
 	}
+	if dt then newhistory["date"] = dt end
+	if tm then newhistory["time"] = tm end
+
+	GoogleSheetDKP.db.profile.history[GoogleSheetDKP.db.profile.nexthistory] = newhistory
 
 	local newdkp = GoogleSheetDKP.db.profile.current[name] + tonumber(change)
 	if newdkp < 0 and not GoogleSheetDKP.db.profile.negative_allowed then newdkp = 0 end
@@ -305,17 +314,25 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent)
 	if comment then hist = hist .. " / " .. comment end
 	hist = hist .. " (has now " .. newdkp .. "DKP)"
 
-	GoogleSheetDKP:Print(hist)
 
+	if commSender then
+		GoogleSheetDKP:Print(hist .. " (by API from " .. commSender ")")
+	else
+		GoogleSheetDKP:Print(hist)
 
-	if not silent and GoogleSheetDKP.db.profile.output_raid then
-		SendChatMessage(hist, "RAID")
-	end
-	if not silent and GoogleSheetDKP.db.profile.output_user then
-		SendChatMessage(hist, "WHISPER", nil, name)
+		if not silent and GoogleSheetDKP.db.profile.output_raid then
+			SendChatMessage(hist, "RAID")
+		end
+		if not silent and GoogleSheetDKP.db.profile.output_user then
+			SendChatMessage(hist, "WHISPER", nil, name)
+		end
+
+		-- if it didn't come in by comms, send out by comms
+		GoogleSheetDKP:sendChange(newhistory)
 	end
 
 	GoogleSheetDKP.db.profile.nexthistory = GoogleSheetDKP.db.profile.nexthistory + 1
+	GoogleSheetDKP.db.profile.historytimestamp = time()
 
 	-- set timer to remind to reload, to store data (3min after last change)
 	if GoogleSheetDKP.reminderTimer ~= nil then

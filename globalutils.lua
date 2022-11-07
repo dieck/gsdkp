@@ -13,6 +13,15 @@ function GoogleSheetDKP:pairsByKeys (t, f)
      return iter
 end
 
+function GoogleSheetDKP:tablekeys(t)
+	local k = {}
+	for key,val in pairs(t) do
+		tinsert(k, key)
+	end
+	return k
+end
+
+
 -- for debug outputs
 function GoogleSheetDKP:tprint (tbl, indent)
   if not indent then indent = 0 end

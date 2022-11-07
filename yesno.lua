@@ -1,6 +1,9 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("GoogleSheetDKP", true)
 
 function GoogleSheetDKP:createTwoDialogFrame(title, text, onetxt, one, twotxt, two)
+	if not GoogleSheetDKP.frameCounter then GoogleSheetDKP.frameCounter = 0 end
+    GoogleSheetDKP.frameCounter = GoogleSheetDKP.frameCounter + 1
+
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local f = AceGUI:Create("Window")
@@ -12,8 +15,8 @@ function GoogleSheetDKP:createTwoDialogFrame(title, text, onetxt, one, twotxt, t
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 
 	-- close on escape
-	_G["GoogleSheetDKPGoogleSheetDKP.twodialogframe"] = f.frame
-	tinsert(UISpecialFrames, "GoogleSheetDKPGoogleSheetDKP.twodialogframe")
+	_G["GoogleSheetDKPGoogleSheetDKP.twodialogframe" .. tostring(GoogleSheetDKP.frameCounter)] = f.frame
+	tinsert(UISpecialFrames, "GoogleSheetDKPGoogleSheetDKP.twodialogframe" .. tostring(GoogleSheetDKP.frameCounter))
 
 	local txt = AceGUI:Create("Label")
 	txt:SetText(text)
@@ -23,17 +26,13 @@ function GoogleSheetDKP:createTwoDialogFrame(title, text, onetxt, one, twotxt, t
 	local button1 = AceGUI:Create("Button")
 	button1:SetText(onetxt)
 	button1:SetRelativeWidth(0.5)
-	button1:SetCallback("OnClick", function()
-		one()
-	end)
+	button1:SetCallback("OnClick", one)
 	f:AddChild(button1)
 
 	local button2 = AceGUI:Create("Button")
 	button2:SetText(twotxt)
 	button2:SetRelativeWidth(0.5)
-	button2:SetCallback("OnClick", function()
-		two()
-	end)
+	button2:SetCallback("OnClick", two)
 	f:AddChild(button2)
 
 	return f
@@ -41,6 +40,9 @@ end
 
 
 function GoogleSheetDKP:createThreeDialogFrame(title, text, onetxt, one, twotxt, two, threetxt, three)
+	if not GoogleSheetDKP.frameCounter then GoogleSheetDKP.frameCounter = 0 end
+    GoogleSheetDKP.frameCounter = GoogleSheetDKP.frameCounter + 1
+
 	local AceGUI = LibStub("AceGUI-3.0")
 
 	local f = AceGUI:Create("Window")
@@ -52,8 +54,8 @@ function GoogleSheetDKP:createThreeDialogFrame(title, text, onetxt, one, twotxt,
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 
 	-- close on escape
-	_G["GoogleSheetDKPGoogleSheetDKP.threedialogframe"] = f.frame
-	tinsert(UISpecialFrames, "GoogleSheetDKPGoogleSheetDKP.threedialogframe")
+	_G["GoogleSheetDKPGoogleSheetDKP.threedialogframe" .. tostring(GoogleSheetDKP.frameCounter)] = f.frame
+	tinsert(UISpecialFrames, "GoogleSheetDKPGoogleSheetDKP.threedialogframe" .. tostring(GoogleSheetDKP.frameCounter))
 
 	local txt = AceGUI:Create("Label")
 	txt:SetText(text)
@@ -63,24 +65,24 @@ function GoogleSheetDKP:createThreeDialogFrame(title, text, onetxt, one, twotxt,
 	local button1 = AceGUI:Create("Button")
 	button1:SetText(onetxt)
 	button1:SetRelativeWidth(0.33)
-	button1:SetCallback("OnClick", function()
-		one()
+	button1:SetCallback("OnClick", function(widget)
+		one(widget)
 	end)
 	f:AddChild(button1)
 
 	local button2 = AceGUI:Create("Button")
 	button2:SetText(twotxt)
 	button2:SetRelativeWidth(0.33)
-	button2:SetCallback("OnClick", function()
-		two()
+	button2:SetCallback("OnClick", function(widget)
+		two(widget)
 	end)
 	f:AddChild(button2)
 
 	local button3 = AceGUI:Create("Button")
 	button3:SetText(threetxt)
 	button3:SetRelativeWidth(0.33)
-	button3:SetCallback("OnClick", function()
-		three()
+	button3:SetCallback("OnClick", function(widget)
+		three(widget)
 	end)
 	f:AddChild(button3)
 
@@ -126,4 +128,14 @@ function GoogleSheetDKP:askToTakeAttendance()
 
 	GoogleSheetDKP.attendanceframe = GoogleSheetDKP:createThreeDialogFrame("Attendance", "Shall I take Raid Attendance now?", "Yes", yes, "Later", later, "Not this session", no)
 	GoogleSheetDKP.attendanceframe:Show()
+end
+
+function GoogleSheetDKP:askToRequestSyncCrash()
+	-- need to do this by timer. There seems to be no Event for "Interface is fully loaded and ready to handle GUI"
+	GoogleSheetDKP:ScheduleTimer(function() 
+		local yes = function() GoogleSheetDKP:sendSyncRequest() GoogleSheetDKP.resyncFrame:Hide() end
+		local no = function() GoogleSheetDKP.resyncFrame:Hide() end
+		GoogleSheetDKP.resyncFrame = GoogleSheetDKP:createTwoDialogFrame("Addon crashed", "It seems the addon has crashed. Request sync from other users?", "Yes", yes, "No", no)
+		GoogleSheetDKP.resyncFrame:Show()
+	end, 10)
 end
