@@ -19,8 +19,10 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 
 	if GoogleSheetDKP.commUUIDseen[d["uuid"]] then
 		GoogleSheetDKP:Debug("received comm " .. d["uuid"] .. ": already seen, ignoring " .. d["command"] .. " from " .. sender)
+		return
 	end
-
+	GoogleSheetDKP.commUUIDseen[d["uuid"]] = time()
+	
 	GoogleSheetDKP:Debug("received comm " .. d["uuid"] .. ": " .. d["command"] .. " from " .. sender)
 
 

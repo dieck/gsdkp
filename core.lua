@@ -331,6 +331,7 @@ function GoogleSheetDKP:OnInitialize()
 	end
 
 	if GoogleSheetDKP.db.profile.nexthistory == nil then GoogleSheetDKP.db.profile.nexthistory = 1 end
+	if GoogleSheetDKP.db.profile.historytimestamp == nil then GoogleSheetDKP.db.profile.historytimestamp = 0 end
 	if GoogleSheetDKP.db.profile.history == nil then GoogleSheetDKP.db.profile.history = {} end
 	if GoogleSheetDKP.db.profile.current == nil then GoogleSheetDKP.db.profile.current = {} end
 
