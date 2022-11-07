@@ -316,7 +316,7 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent, dt, tm, com
 
 
 	if commSender then
-		GoogleSheetDKP:Print(hist .. " (by API from " .. commSender ")")
+		GoogleSheetDKP:Print(hist .. " (by API from " .. commSender .. ")")
 	else
 		GoogleSheetDKP:Print(hist)
 

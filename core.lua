@@ -186,10 +186,88 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 					get = function (info) return GoogleSheetDKP:Export() end,
 					cmdHidden = true,
 				},
-				newline211 = { name="", type="description", order=51 },
+				newline211 = { name="", type="description", order=211 },
 				note212 = { name="Copy full content and paste to Google Doc History tab, adding at the end", type="description", order=212 },
 
 			}
+		},
+
+		grpsyncs = {
+			type = "group",
+			name = "Sync",
+			args = {
+
+				allowed = {
+					name = "Always accept from",
+					type = "input",
+					order = 310,
+					width = 3.0,
+					multiline = true,
+					get = function (info)
+						local s = ""
+						for k,v in pairs(GoogleSheetDKP.db.profile.acceptSender) do
+							local valid = date("%H:%M", v + 4*60*60)
+							s = s .. k .. " (valid until " .. valid .. ")\r\n"
+						end
+						return s
+					end,
+					cmdHidden = true,
+				},
+				newline311 = { name="", type="description", order=311 },
+
+				clearallowed = {
+					order = 315,
+					name = "Clear accepted",
+					type = "execute",
+					confirm = true,
+					func = function(info) GoogleSheetDKP.db.profile.acceptSender = {} end,
+				},
+				newline316 = { name="", type="description", order=316 },
+
+				ignored = {
+					name = "Always ignore from",
+					type = "input",
+					order = 320,
+					width = 3.0,
+					multiline = true,
+					get = function (info)
+						local s = ""
+						for k,v in pairs(GoogleSheetDKP.db.profile.ignoreSender) do
+							local valid = date("%H:%M", v + 4*60*60)
+							s = s .. k .. " (valid until " .. valid .. ")\r\n"
+						end
+						return s
+					end,
+					cmdHidden = true,
+				},
+				newline321 = { name="", type="description", order=321 },
+
+				clearignored = {
+					order = 325,
+					name = "Clear ignored",
+					type = "execute",
+					confirm = true,
+					func = function(info) GoogleSheetDKP.db.profile.ignoreSender = {} end,
+				},
+				newline326 = { name="", type="description", order=326 },
+
+				requestsync = {
+					order = 330,
+					name = "Request Sync (pull)",
+					type = "execute",
+					confirm = true,
+					func = function(info) GoogleSheetDKP:sendSyncRequest() end,
+				},
+
+				senddata = {
+					order = 335,
+					name = "Offer Data (push)",
+					type = "execute",
+					confirm = true,
+					func = function(info) GoogleSheetDKP:sendSyncOffer() end,
+				},
+
+			},
 		},
 
 		grphelp = {
@@ -245,14 +323,6 @@ function GoogleSheetDKP:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("GoogleSheetDKP", self.gsdkpOptionsTable)
 	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GoogleSheetDKP", "GoogleSheetDKP")
 
-	-- interaction from raid members
-	self:RegisterEvent("CHAT_MSG_WHISPER")
-
-	self:RegisterChatCommand("gsdkp", "ChatCommand")
-
-	self:RegisterComm(GoogleSheetDKP.commPrefix, "OnCommReceived")
-	self:RegisterComm(GoogleSheetDKP.commPrefixCSLS, "OnCommReceivedCSLS")
-
 	self.onetimes = {}
 
 	-- change default output language if configured
@@ -278,10 +348,24 @@ function GoogleSheetDKP:OnInitialize()
 	if not GoogleSheetDKP.db.profile.ignoreSender then GoogleSheetDKP.db.profile.ignoreSender = {} end
 	if not GoogleSheetDKP.db.profile.acceptSender then GoogleSheetDKP.db.profile.acceptSender = {} end
 
+	GoogleSheetDKP.latestSyncOfferTime = 0
+	GoogleSheetDKP.latestSyncOfferAccept = {}
+
+	GoogleSheetDKP.commUUIDseen = {}
 end
 
 function GoogleSheetDKP:OnEnable()
 	-- Called when the addon is enabled
+
+	-- interaction from raid members
+	self:RegisterEvent("CHAT_MSG_WHISPER")
+	self:RegisterEvent("PLAYER_LOGOUT")
+
+	self:RegisterChatCommand("gsdkp", "ChatCommand")
+
+	self:RegisterComm(GoogleSheetDKP.commPrefix, "OnCommReceived")
+	self:RegisterComm(GoogleSheetDKP.commPrefixCSLS, "OnCommReceivedCSLS")
+
 	if not GoogleSheetDKP.db.profiles.properlyEnded then
 		GoogleSheetDKP:Debug("Error: not properly ended. Will request information")
 		GoogleSheetDKP:askToRequestSyncCrash()
@@ -291,9 +375,16 @@ end
 
 function GoogleSheetDKP:OnDisable()
     -- Called when the addon is disabled
-	GoogleSheetDKP.db.profiles.properlyEnded = true
+	self:UnregisterEvent("CHAT_MSG_WHISPER")
+	self:UnregisterEvent("PLAYER_LOGOUT")
+	self:UnregisterAllComm()
 end
 
+function GoogleSheetDKP:PLAYER_LOGOUT()
+	-- event is called just before variables are saved
+	-- and we need this variable to be saved ;)
+	GoogleSheetDKP.db.profiles.properlyEnded = true
+end
 
 function GoogleSheetDKP:ChatCommand(inc)
 

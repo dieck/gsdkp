@@ -107,7 +107,11 @@ function GoogleSheetDKP:askToTakeAttendance()
 		return nil
 	end
 
-	GoogleSheetDKP.attendanceframe = nil
+	-- only if not already shown
+
+	if GoogleSheetDKP.attendanceframe then
+		return nil
+	end
 
 	local yes = function()
 		GoogleSheetDKP.attendanceframe:Hide()

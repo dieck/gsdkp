@@ -47,3 +47,24 @@ function GoogleSheetDKP:tprint (tbl, indent)
   toprint = toprint .. string.rep(" ", indent-2) .. "}"
   return toprint
 end
+
+-- derived from https://github.com/anders/luabot-scripts/blob/master/etc/UUID.lua, under Eclipse Public License 1.0 (minor adjustments for WoW usage)
+function GoogleSheetDKP:UUID()
+	local chars = {"0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"}
+	local uuid = {[9]="-",[14]="-",[15]="4",[19]="-",[24]="-"}
+	local r, index
+	for i = 1,36 do
+		if(uuid[i]==nil)then
+			-- r = 0 | Math.random()*16;
+			r = random (16)
+			if(i == 20)then
+				-- bits 1+2 of pos 20 are "10". bin1000 = dec8. 2-bits are 0-3
+				index = random(0,3) + 8
+			else
+				index = r
+			end
+			uuid[i] = chars[index]
+		end
+	end
+	return table.concat(uuid)
+end
