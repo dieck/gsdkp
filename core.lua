@@ -1,5 +1,10 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("GoogleSheetDKP", true)
 
+GoogleSheetDKP.commPrefix = "GSDKP-1.0-"
+GoogleSheetDKP.commVersion = 20221107
+
+GoogleSheetDKP.commPrefixCSLS = "GSDKPCSLS-1"
+
 local defaults = {
   profile = {
     debug = false,
@@ -234,47 +239,59 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 }
 
 function GoogleSheetDKP:OnInitialize()
-  -- Code that you want to run when the addon is first loaded goes here.
-  self.db = LibStub("AceDB-3.0"):New("GoogleSheetDKPDB", defaults)
+	-- Code that you want to run when the addon is first loaded goes here.
+	self.db = LibStub("AceDB-3.0"):New("GoogleSheetDKPDB", defaults)
 
-  LibStub("AceConfig-3.0"):RegisterOptionsTable("GoogleSheetDKP", self.gsdkpOptionsTable)
-  self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GoogleSheetDKP", "GoogleSheetDKP")
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("GoogleSheetDKP", self.gsdkpOptionsTable)
+	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GoogleSheetDKP", "GoogleSheetDKP")
 
-  -- interaction from raid members
-  self:RegisterEvent("CHAT_MSG_WHISPER")
+	-- interaction from raid members
+	self:RegisterEvent("CHAT_MSG_WHISPER")
 
-  self:RegisterChatCommand("gsdkp", "ChatCommand")
+	self:RegisterChatCommand("gsdkp", "ChatCommand")
 
-  self.onetimes = {}
+	self:RegisterComm(GoogleSheetDKP.commPrefix, "OnCommReceived")
+	self:RegisterComm(GoogleSheetDKP.commPrefixCSLS, "OnCommReceivedCSLS")
 
-  -- change default output language if configured
-  if GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage] ~= nil then
-	for k,v in pairs(GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage]) do L[k] = v end
-  end
+	self.onetimes = {}
 
-  if GoogleSheetDKP.db.profile.nexthistory == nil then GoogleSheetDKP.db.profile.nexthistory = 1 end
-  if GoogleSheetDKP.db.profile.history == nil then GoogleSheetDKP.db.profile.history = {} end
-  if GoogleSheetDKP.db.profile.current == nil then GoogleSheetDKP.db.profile.current = {} end
+	-- change default output language if configured
+	if GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage] ~= nil then
+		for k,v in pairs(GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage]) do L[k] = v end
+	end
 
-  -- for "later" option, will be compared against time()
-  self.attendancereminder = 0
+	if GoogleSheetDKP.db.profile.nexthistory == nil then GoogleSheetDKP.db.profile.nexthistory = 1 end
+	if GoogleSheetDKP.db.profile.history == nil then GoogleSheetDKP.db.profile.history = {} end
+	if GoogleSheetDKP.db.profile.current == nil then GoogleSheetDKP.db.profile.current = {} end
 
-  if self.db.profile.raidattendance_taken == nil then self.db.profile.raidattendance_taken = 0 end
+	-- for "later" option, will be compared against time()
+	self.attendancereminder = 0
 
-  -- remove stored attendance if older than 12 hours
-  if self.db.profile.raidattendance_taken + 12*60*60 < time() then
-	self.db.profile.raidattendance = nil
-	self.db.profile.raidattendance_taken = 0
-  end
+	if self.db.profile.raidattendance_taken == nil then self.db.profile.raidattendance_taken = 0 end
+
+	-- remove stored attendance if older than 12 hours
+	if self.db.profile.raidattendance_taken + 12*60*60 < time() then
+		self.db.profile.raidattendance = nil
+		self.db.profile.raidattendance_taken = 0
+	end
+
+	if not GoogleSheetDKP.db.profile.ignoreSender then GoogleSheetDKP.db.profile.ignoreSender = {} end
+	if not GoogleSheetDKP.db.profile.acceptSender then GoogleSheetDKP.db.profile.acceptSender = {} end
 
 end
 
 function GoogleSheetDKP:OnEnable()
-    -- Called when the addon is enabled
+	-- Called when the addon is enabled
+	if not GoogleSheetDKP.db.profiles.properlyEnded then
+		GoogleSheetDKP:Debug("Error: not properly ended. Will request information")
+		GoogleSheetDKP:askToRequestSyncCrash()
+	end
+	GoogleSheetDKP.db.profiles.properlyEnded = false
 end
 
 function GoogleSheetDKP:OnDisable()
     -- Called when the addon is disabled
+	GoogleSheetDKP.db.profiles.properlyEnded = true
 end
 
 

@@ -2,7 +2,7 @@
 ## Title: GoogleSheetDKP
 ## Notes: Simple interface for using DKP with a google sheet
 ## Author: dieck
-## Version: 20210123
+## Version: 20221107
 ## SavedVariables: GoogleSheetDKPDB
 
 
@@ -20,5 +20,7 @@ locale-deDE.lua
 gui.lua
 dkp.lua
 yesno.lua
+comms.lua
+comms-cheesesls.lua
 core.lua
 

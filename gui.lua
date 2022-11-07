@@ -98,7 +98,7 @@ function GoogleSheetDKP:createDKPFrame()
 	lbHR2:SetText("-----------------------------")
 	lbHR2:SetColor(128,128,0)
 	lbHR2:SetRelativeWidth(0.49)
-	s:AddChild(lbHR)
+	s:AddChild(lbHR2)
 
 	local lbHR3 = AceGUI:Create("Label")
 	lbHR3:SetText(" ")
