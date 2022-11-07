@@ -19,7 +19,6 @@ function GoogleSheetDKP:OnCommReceivedCSLS(prefix, message, distribution, sender
 			GoogleSheetDKP:sendDKPResult(sender)
 		end
 	end
-
 end
 
 -- send out "new" loot to other CheeseSLSLootTracker

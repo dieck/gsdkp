@@ -33,7 +33,7 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 	
 	if d["command"] == "SYNC_REQUEST" then
 		GoogleSheetDKP.latestSeenRemoteData = d["historytimestamp"]
-	
+
 		-- send offer if my data is newer
 		if GoogleSheetDKP.db.profile.historytimestamp > d["historytimestamp"] or GoogleSheetDKP.db.profile.nexthistory > d["nexthistory"] then
 			GoogleSheetDKP:sendSyncOffer()
@@ -71,7 +71,7 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 			GoogleSheetDKP.latestSyncOfferTime = d["historytimestamp"]
 			GoogleSheetDKP.latestSyncOffer = { d = d, sender = sender }
 		end
-	
+
 		if not GoogleSheetDKP.syncOfferTimer then
 			GoogleSheetDKP.syncOfferTimer = GoogleSheetDKP:ScheduleTimer(GoogleSheetDKP:handleSyncOffer, 10) 
 		end
@@ -143,9 +143,9 @@ function GoogleSheetDKP:handleSyncOffer()
 		GoogleSheetDKP.db.profile.nexthistory = d["nexthistory"]
 
 	else
-	
+
 		GoogleSheetDKP.latestSyncOfferAccept = {}
-	
+
 		-- else request and handle later
 		local accept = function(widget)
 			GoogleSheetDKP.latestSyncOfferAccept[widget.parent.paramSender] = time()
@@ -156,7 +156,7 @@ function GoogleSheetDKP:handleSyncOffer()
 		end
 
 		local txt = sender .. " has offered full DKP list."
-	
+
 		if GoogleSheetDKP.db.profile.historytimestamp > d["historytimestamp"] then
 			txt = txt .. " WARNING: DATA IS OLDER THAN EXISTING."
 		end
