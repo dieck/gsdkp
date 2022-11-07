@@ -32,8 +32,8 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				hdrquery = { type = "header", name = "Queries", order = 100 },
 
 				qryraid = {
-					name = "Raid",
-					desc = "Accept queries for current DKP and list from Raid members",
+					name = L["Raid"],
+					desc = L["Accept queries for current DKP and list from Raid members"],
 					type = "toggle",
 					order = 110,
 					set = function(info,val) GoogleSheetDKP.db.profile.query_raid = val end,
@@ -42,8 +42,8 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline111 = { name="", type="description", order=111 },
 
 				qryext = {
-					name = "External",
-					desc = "Accept queries for current DKP and list from all users",
+					name = L["External"],
+					desc = L["Accept queries for current DKP and list from all users"],
 					type = "toggle",
 					order = 120,
 					set = function(info,val) GoogleSheetDKP.db.profile.query_external = val end,
@@ -54,8 +54,8 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				hdroutput = { type = "header", name = "Output", order = 200 },
 
 				outraid = {
-					name = "Raid",
-					desc = "Output DKP changes to Raid",
+					name = L["Raid"],
+					desc = L["Output DKP changes to Raid"],
 					type = "toggle",
 					order = 210,
 					set = function(info,val) GoogleSheetDKP.db.profile.output_raid = val end,
@@ -64,8 +64,8 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline211 = { name="", type="description", order=211 },
 
 				outuser = {
-					name = "User",
-					desc = "Output DKP changes to User",
+					name = L["User"],
+					desc = L["Output DKP changes to User"],
 					type = "toggle",
 					order = 220,
 					set = function(info,val) GoogleSheetDKP.db.profile.output_user = val end,
@@ -95,27 +95,27 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				hdrconf = { type = "header", name = "Configuration", order = 300 },
 
 				newuser = {
-					name = "Create users",
-					desc = "Accept changes for users without current DKP import",
+					name = L["Create users"],
+					desc = L["Accept changes for users without current DKP import"],
 					type = "toggle",
 					order = 310,
 					set = function(info,val) GoogleSheetDKP.db.profile.create_new_users = val end,
 					get = function(info) return GoogleSheetDKP.db.profile.create_new_users end,
 				},
 				newdkp = {
-					name = "Start DKP",
-					desc = "For new users, set this start DKP",
+					name = L["Start DKP"],
+					desc = L["For new users, set this start DKP"],
 					type = "input",
 					order = 315,
-					validate = function(info,v) if tonumber(v) == nil then return "Start DKP: Please enter a number" else return true end end,
+					validate = function(info,v) if tonumber(v) == nil then return L["Start DKP: Please enter a number"] else return true end end,
 					set = function(info,val) GoogleSheetDKP.db.profile.create_new_dkp = val end,
 					get = function(info) return GoogleSheetDKP.db.profile.create_new_dkp end,
 				},
 				newline319 = { name="", type="description", order=319 },
 
 				negative = {
-					name = "Allow negative",
-					desc = "Allow DKP to go negative (otherwise stay at zero)",
+					name = L["Allow negative"],
+					desc = L["Allow DKP to go negative (otherwise stay at zero)"],
 					type = "toggle",
 					order = 320,
 					set = function(info,val) GoogleSheetDKP.db.profile.negative_allowed = val end,
@@ -124,19 +124,19 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline321 = { name="", type="description", order=321 },
 
 				chatlog = {
-					name = "Chatlog",
-					desc = "Starts chatlog with first change action",
+					name = L["Chatlog"],
+					desc = L["Starts chatlog with first change action"],
 					type = "toggle",
 					order = 330,
 					set = function(info,val) GoogleSheetDKP.db.profile.chatlog = val end,
 					get = function(info) return GoogleSheetDKP.db.profile.chatlog end,
 				},
 				newline331 = { name="", type="description", order=331 },
-				note332 = { name="Capture Chat log for easier resolve of disputes and discussions about DKP after a raid", type="description", order=332 },
+				note332 = { name=L["Capture Chat log for easier resolve of disputes and discussions about DKP after a raid"], type="description", order=332 },
 
 				attendance = {
-					name = "Attendence reminder",
-					desc = "Remind to store attendance for later Raid DKP assignment",
+					name = L["Attendence reminder"],
+					desc = L["Remind to store attendance for later Raid DKP assignment"],
 					type = "toggle",
 					order = 340,
 					set = function(info,val) GoogleSheetDKP.db.profile.remind_attendance = val end,
@@ -151,22 +151,22 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 			name = "Import",
 			args = {
 
-				note108 = { name="Copy & paste full Current DKP Tab from Google Doc here, including headers", type="description", order=108 },
+				note108 = { name=L["Copy & paste full Current DKP Tab from Google Doc here, including headers"], type="description", order=108 },
 				newline109 = { name="", type="description", order=109 },
 				import = {
-					name = "Import String",
+					name = L["Import String"],
 					type = "input",
 					order = 110,
 					confirm = true,
 					width = 3.0,
 					multiline = true,
 					set = function(info, value) GoogleSheetDKP:Import(info, value)  end,
-					usage = "Copy & paste full Current DKP Tab from Google Doc here, including headers",
+					usage = L["Copy & paste full Current DKP Tab from Google Doc here, including headers"],
 					cmdHidden = true,
 				},
 				newline111 = { name="", type="description", order=51 },
-				note112 = { name="Be aware that the DKP table will be OVERWRITTEN and existing changes DELETED!", type="description", order=112 },
-				note113 = { name="Export first, if you have current data!", type="description", order=113 },
+				note112 = { name=L["Be aware that the DKP table will be OVERWRITTEN and existing changes DELETED!"], type="description", order=112 },
+				note113 = { name=L["Export first, if you have current data!"], type="description", order=113 },
 
 			}
 		},
@@ -177,7 +177,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 			args = {
 
 				import = {
-					name = "Export String",
+					name = L["Export String"],
 					type = "input",
 					order = 210,
 					confirm = true,
@@ -187,18 +187,18 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 					cmdHidden = true,
 				},
 				newline211 = { name="", type="description", order=211 },
-				note212 = { name="Copy full content and paste to Google Doc History tab, adding at the end", type="description", order=212 },
+				note212 = { name=L["Copy full content and paste to Google Doc History tab, adding at the end"], type="description", order=212 },
 
 			}
 		},
 
 		grpsyncs = {
 			type = "group",
-			name = "Sync",
+			name = L["Sync"],
 			args = {
 
 				allowed = {
-					name = "Always accept from",
+					name = L["Always accept from"],
 					type = "input",
 					order = 310,
 					width = 3.0,
@@ -207,7 +207,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 						local s = ""
 						for k,v in pairs(GoogleSheetDKP.db.profile.acceptSender) do
 							local valid = date("%H:%M", v + 4*60*60)
-							s = s .. k .. " (valid until " .. valid .. ")\r\n"
+							s = s .. L["user (valid until date)"](k, valid) .. "\r\n"
 						end
 						return s
 					end,
@@ -217,7 +217,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 
 				clearallowed = {
 					order = 315,
-					name = "Clear accepted",
+					name = L["Clear accepted"],
 					type = "execute",
 					confirm = true,
 					func = function(info) GoogleSheetDKP.db.profile.acceptSender = {} end,
@@ -225,7 +225,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline316 = { name="", type="description", order=316 },
 
 				ignored = {
-					name = "Always ignore from",
+					name = L["Always ignore from"],
 					type = "input",
 					order = 320,
 					width = 3.0,
@@ -234,7 +234,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 						local s = ""
 						for k,v in pairs(GoogleSheetDKP.db.profile.ignoreSender) do
 							local valid = date("%H:%M", v + 4*60*60)
-							s = s .. k .. " (valid until " .. valid .. ")\r\n"
+							s = s .. L["user (valid until date)"](k, valid) .. "\r\n"
 						end
 						return s
 					end,
@@ -244,7 +244,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 
 				clearignored = {
 					order = 325,
-					name = "Clear ignored",
+					name = L["Clear ignored"],
 					type = "execute",
 					confirm = true,
 					func = function(info) GoogleSheetDKP.db.profile.ignoreSender = {} end,
@@ -253,7 +253,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 
 				requestsync = {
 					order = 330,
-					name = "Request Sync (pull)",
+					name = L["Request Sync (pull)"],
 					type = "execute",
 					confirm = true,
 					func = function(info) GoogleSheetDKP:sendSyncRequest() end,
@@ -261,7 +261,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 
 				senddata = {
 					order = 335,
-					name = "Offer Data (push)",
+					name = L["Offer Data (push)"],
 					type = "execute",
 					confirm = true,
 					func = function(info) GoogleSheetDKP:sendSyncOffer() end,
@@ -272,36 +272,36 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 
 		grphelp = {
 			type = "group",
-			name = "Help",
+			name = L["Help"],
 			order = 800,
 			args = {
 
-				n01 = { order=01, type="description", name="Quickstart:" },
-				n02 = { order=02, type="description", name="Copy Template https://bit.ly/GoogleSheetDKP" },
-				n03 = { order=03, type="description", name="Import from Current DKP tab, Export to History Tab" },
+				n01 = { order=01, type="description", name=L["Quickstart:"] },
+				n02 = { order=02, type="description", name=L["Copy Template https://bit.ly/GoogleSheetDKP"] },
+				n03 = { order=03, type="description", name=L["Import from Current DKP tab, Export to History Tab"] },
 				n04 = { order=04, type="description", name="" },
-				n05 = { order=05, type="description", name="Usage:" },
-				n06 = { order=06, type="description", name="/gsdkp: opens overview GUI" },
-				n07 = { order=07, type="description", name="/gsdkp config: opens configuration view with Import/Export/Help" },
-				n08 = { order=08, type="description", name="/gsdkp action: opens action menu for simplified usage of the next options:" },
+				n05 = { order=05, type="description", name=L["Usage:"] },
+				n06 = { order=06, type="description", name=L["/gsdkp: opens overview GUI"] },
+				n07 = { order=07, type="description", name=L["/gsdkp config: opens configuration view with Import/Export/Help"] },
+				n08 = { order=08, type="description", name=L["/gsdkp action: opens action menu for simplified usage of the next options:"] },
 				n09 = { order=09, type="description", name="" },
-				n10 = { order=10, type="description", name="/gsdkp change NAME VALUE CAUSE [COMMENT]: commits manual DKP change" },
-				n11 = { order=11, type="description", name="/gsdkp item NAME VALUE ITEMLINK: commits manual DKP change for Item awards. Value will *not* be negated! (Use e.g. -10 for costs)" },
-				n12 = { order=12, type="description", name="/gsdkp raidchange VALUE CAUSE [COMMENT]: commits DKP change to all current raid members (also /gsdkp raid)" },
-				n12 = { order=12, type="description", name="/gsdkp raidinit VALUE CAUSE [COMMENT]: commits DKP change to all current raid members (also /gsdkp init)" },
-				n13 = { order=13, type="description", name="Please note: CAUSE can only be a single word, e.g. 'Item', 'Bonus', 'Participation', 'FirstKill'" },
+				n10 = { order=10, type="description", name=L["/gsdkp change NAME VALUE CAUSE [COMMENT]: commits manual DKP change"] },
+				n11 = { order=11, type="description", name=L["/gsdkp item NAME VALUE ITEMLINK: commits manual DKP change for Item awards. Value will *not* be negated! (Use e.g. -10 for costs)"] },
+				n12 = { order=12, type="description", name=L["/gsdkp raidchange VALUE CAUSE [COMMENT]: commits DKP change to all current raid members (also /gsdkp raid)"] },
+				n12 = { order=12, type="description", name=L["/gsdkp raidinit VALUE CAUSE [COMMENT]: commits DKP change to all current raid members (also /gsdkp init)"] },
+				n13 = { order=13, type="description", name=L["Please note: CAUSE can only be a single word, e.g. 'Item', 'Bonus', 'Participation', 'FirstKill'"] },
 				n14 = { order=14, type="description", name="" },
-				n15 = { order=15, type="description", name="/gsdkp raidattendance: takes raid attendance to be used for next raidchange" },
-				n16 = { order=16, type="description", name="/gsdkp raidattendance delete: deletes stored raid attendance" },
+				n15 = { order=15, type="description", name=L["/gsdkp raidattendance: takes raid attendance to be used for next raidchange"] },
+				n16 = { order=16, type="description", name=L["/gsdkp raidattendance delete: deletes stored raid attendance"] },
 				n17 = { order=17, type="description", name="" },
-				n18 = { order=18, type="description", name="API:" },
-				n19 = { order=19, type="description", name="Google Sheet DKP can be used by other addons to manage DKP:" },
-				n20 = { order=20, type="description", name="GoogleSheetDKP:GetDKP(name)" },
-				n21 = { order=21, type="description", name="GoogleSheetDKP:Change(name, value, cause, comment)" },
-				n22 = { order=22, type="description", name="GoogleSheetDKP:RaidChange(value, cause, comment)" },
-				n23 = { order=23, type="description", name="GoogleSheetDKP:RaidInit()" },
-				n24 = { order=24, type="description", name="GoogleSheetDKP:Item(name, value, itemLink)" },
-				n25 = { order=25, type="description", name="GoogleSheetDKP:RaidAttendance(['delete'])" },
+				n18 = { order=18, type="description", name=L["API:"] },
+				n19 = { order=19, type="description", name=L["Google Sheet DKP can be used by other addons to manage DKP:"] },
+				n20 = { order=20, type="description", name=L["GoogleSheetDKP:GetDKP(name)"] },
+				n21 = { order=21, type="description", name=L["GoogleSheetDKP:Change(name, value, cause, comment)"] },
+				n22 = { order=22, type="description", name=L["GoogleSheetDKP:RaidChange(value, cause, comment)"] },
+				n23 = { order=23, type="description", name=L["GoogleSheetDKP:RaidInit()"] },
+				n24 = { order=24, type="description", name=L["GoogleSheetDKP:Item(name, value, itemLink)"] },
+				n25 = { order=25, type="description", name=L["GoogleSheetDKP:RaidAttendance(['delete'])"] },
 			}
 		},
 

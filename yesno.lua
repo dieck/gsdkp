@@ -108,7 +108,6 @@ function GoogleSheetDKP:askToTakeAttendance()
 	end
 
 	-- only if not already shown
-
 	if GoogleSheetDKP.attendanceframe then
 		return nil
 	end
@@ -130,7 +129,7 @@ function GoogleSheetDKP:askToTakeAttendance()
 		-- do nothing
 	end
 
-	GoogleSheetDKP.attendanceframe = GoogleSheetDKP:createThreeDialogFrame("Attendance", "Shall I take Raid Attendance now?", "Yes", yes, "Later", later, "Not this session", no)
+	GoogleSheetDKP.attendanceframe = GoogleSheetDKP:createThreeDialogFrame(L["Attendance"], L["Shall I take Raid Attendance now?"], L["Yes"], yes, L["Later"], later, L["Not this session"], no)
 	GoogleSheetDKP.attendanceframe:Show()
 end
 
@@ -139,7 +138,7 @@ function GoogleSheetDKP:askToRequestSyncCrash()
 	GoogleSheetDKP:ScheduleTimer(function()
 		local yes = function() GoogleSheetDKP:sendSyncRequest() GoogleSheetDKP.resyncFrame:Hide() end
 		local no = function() GoogleSheetDKP.resyncFrame:Hide() end
-		GoogleSheetDKP.resyncFrame = GoogleSheetDKP:createTwoDialogFrame("Addon crashed", "It seems the addon has crashed. Request sync from other users?", "Yes", yes, "No", no)
+		GoogleSheetDKP.resyncFrame = GoogleSheetDKP:createTwoDialogFrame(L["Addon crashed"], L["It seems the addon has crashed. Request sync from other users?"], L["Yes"], yes, L["No"], no)
 		GoogleSheetDKP.resyncFrame:Show()
 	end, 10)
 end

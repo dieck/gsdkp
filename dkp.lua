@@ -27,7 +27,7 @@ function GoogleSheetDKP:Import(info, value)
 			-- will only need sum header to get number out of it
 			local _, _, sumhd = strsplit("&", linetsv)
 			if sumhd == nil then
-				GoogleSheetDKP:Print("Incorrect IMPORT format. Did you copy the headers? Please try again.")
+				GoogleSheetDKP:Print(L["Incorrect IMPORT format. Did you copy the headers? Please try again."])
 				return nil
 			end
 			for hnum in string.gmatch(sumhd, "%d+") do
@@ -85,7 +85,7 @@ function GoogleSheetDKP:Export()
 		r = r .. s .. "\r\n"
 	end
 
-	if r == "" then r = "-no history data-" end
+	if r == "" then r = L["-no history data-"] end
 
 	return r
 end
@@ -174,12 +174,12 @@ end
 -- takes raid attendance, can be used later on for raidchange
 function GoogleSheetDKP:Attendance(deletion)
 	if GetNumGroupMembers() == 0 then
-		GoogleSheetDKP:Print("Not in a group.")
+		GoogleSheetDKP:Print(L["Not in a group."])
 		return nil
 	end
 
 	if deletion ~= nil and deletion == "delete" then
-		GoogleSheetDKP:Print("Removed raid attendance list")
+		GoogleSheetDKP:Print(L["Removed raid attendance list"])
 		GoogleSheetDKP.db.profile.raidattendance = nil
 		return nil
 	end
@@ -217,8 +217,7 @@ function GoogleSheetDKP:RaidChange(change, cause, comment)
 		local change = GoogleSheetDKP:Change(name, change, cause, comment, true)
 		changes = changes and change
 	end
-	local chg = "DKP change for the whole raid: " .. change .. " for " .. cause
-	if comment then chg = chg .. " / " .. comment end
+	local chg = L["DKP change for the whole raid: change for cause"](change, cause, comment)
 
 	SendChatMessage(chg, "RAID")
 
@@ -231,7 +230,7 @@ end
 -- add initial DKP for new players
 function GoogleSheetDKP:RaidInit()
 	if GetNumGroupMembers() == 0 then
-		GoogleSheetDKP:Print("Not in a group.")
+		GoogleSheetDKP:Print(L["Not in a group."])
 		return nil
 	end
 	local names = {}
@@ -246,12 +245,12 @@ function GoogleSheetDKP:RaidInit()
 	local changes = true
 	for i,name in ipairs(names) do
 		GoogleSheetDKP.db.profile.current[name] = 0
-		GoogleSheetDKP:Print("New user " .. name .. " added.")
+		GoogleSheetDKP:Print(L["New user name added."](name))
 		-- silent Change
 		local change = GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", true)
 		changes = changes and change
 	end
-	local chg = "Initialized new characters in raid with Start DKP (" .. GoogleSheetDKP.db.profile.create_new_dkp .. "DKP): " .. table.concat(names, ", ")
+	local chg = L["Initialized new characters in raid with Start DKP"](GoogleSheetDKP.db.profile.create_new_dkp, names)
 	SendChatMessage(chg, "RAID")
 	return changes
 end
@@ -276,7 +275,7 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent, dt, tm, com
 			GoogleSheetDKP:Print("New user " .. name .. " added.")
 			GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", silent, commSender)
 		else
-			GoogleSheetDKP:Print("User " .. name .. " unknown and new user creation is not allowed.")
+			GoogleSheetDKP:Print(L["User name unknown and new user creation is not allowed."](name))
 			return nil
 		end
 
@@ -310,13 +309,10 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent, dt, tm, com
 	if newdkp < 0 and not GoogleSheetDKP.db.profile.negative_allowed then newdkp = 0 end
 	GoogleSheetDKP.db.profile.current[name] = newdkp
 
-	local hist = "New DKP entry [" .. GoogleSheetDKP.db.profile.nexthistory .. "]: " .. change .. "DKP to " .. name .. " for " .. cause
-	if comment then hist = hist .. " / " .. comment end
-	hist = hist .. " (has now " .. newdkp .. "DKP)"
-
+	local hist = L["New DKP entry [id]: change DKP to name for cause / comment (has now newdkp DKP)"](GoogleSheetDKP.db.profile.nexthistory, change, name, cause, comment, newdkp)
 
 	if commSender then
-		GoogleSheetDKP:Print(hist .. " (by API from " .. commSender .. ")")
+		GoogleSheetDKP:Print(hist .. " " .. L["(by API from " .. commSender .. ")"])
 	else
 		GoogleSheetDKP:Print(hist)
 
@@ -352,7 +348,7 @@ end
 
 function GoogleSheetDKP:ReloadReminder()
 	-- print reminder
-	GoogleSheetDKP:Print("REMINDER: You may want to consider doing a /reload, to store history DKP data into the saved variables, in case your WoW crashes.")
+	GoogleSheetDKP:Print(L["REMINDER: You may want to consider doing a /reload, to store history DKP data into the saved variables, in case your WoW crashes."])
 
 	-- and remind again every 5min, until reloaded
 	if GoogleSheetDKP.reminderTimer ~= nil then
@@ -373,9 +369,9 @@ function GoogleSheetDKP:CHAT_MSG_WHISPER(event, text, sender)
 		if text == "dkp" then
 
 			if GoogleSheetDKP.db.profile.current[sender] then
-				SendChatMessage("You got " .. GoogleSheetDKP.db.profile.current[sender] .. " DKP.", "WHISPER", nil, sender)
+				SendChatMessage(L["You got current DKP."](GoogleSheetDKP.db.profile.current[sender]), "WHISPER", nil, sender)
 			else
-				SendChatMessage("Found no DKP for your character.", "WHISPER", nil, sender)
+				SendChatMessage(L["Found no DKP for your character."], "WHISPER", nil, sender)
 			end
 
 		end

@@ -5,7 +5,7 @@ GoogleSheetDKP.dkpframe = nil
 
 function GoogleSheetDKP:createDKPFrame()
 	if GoogleSheetDKP.db.profile.current == nil then
-		GoogleSheetDKP:Print("No current DKP information.")
+		GoogleSheetDKP:Print(L["No current DKP information."])
 		return;
 	end
 
@@ -23,7 +23,7 @@ function GoogleSheetDKP:createDKPFrame()
 
 
 	local btCfg = AceGUI:Create("Button")
-	btCfg:SetText("Conf / Imp&Exp / Help")
+	btCfg:SetText(L["Conf / Imp&Exp / Help"])
 	btCfg:SetRelativeWidth(0.5)
 	btCfg:SetCallback("OnClick", function()
 		GoogleSheetDKP.dkpframe:Hide()
@@ -32,7 +32,7 @@ function GoogleSheetDKP:createDKPFrame()
 	f:AddChild(btCfg)
 
 	local btAction = AceGUI:Create("Button")
-	btAction:SetText("Actions")
+	btAction:SetText(L["Actions"])
 	btAction:SetRelativeWidth(0.5)
 	btAction:SetCallback("OnClick", function()
 		GoogleSheetDKP.dkpframe:Hide()
@@ -52,19 +52,19 @@ function GoogleSheetDKP:createDKPFrame()
 	scrollcontainer:AddChild(s)
 
 	local lbHeaderTitle = AceGUI:Create("Label")
-	lbHeaderTitle:SetText("Current DKP")
+	lbHeaderTitle:SetText(L["Current DKP"])
 	lbHeaderTitle:SetRelativeWidth(0.99)
 	lbHeaderTitle:SetColor(128,0,128)
 	s:AddChild(lbHeaderTitle)
 
 	local lbHeaderName = AceGUI:Create("Label")
-	lbHeaderName:SetText("Name")
+	lbHeaderName:SetText(L["Name"])
 	lbHeaderName:SetRelativeWidth(0.49)
 	lbHeaderName:SetColor(128,0,128)
 	s:AddChild(lbHeaderName)
 
 	local lbHeaderDKP = AceGUI:Create("Label")
-	lbHeaderDKP:SetText("DKP")
+	lbHeaderDKP:SetText(L["DKP"])
 	lbHeaderDKP:SetRelativeWidth(0.49)
 	lbHeaderDKP:SetColor(128,0,128)
 	s:AddChild(lbHeaderDKP)
@@ -106,31 +106,31 @@ function GoogleSheetDKP:createDKPFrame()
 	s:AddChild(lbHR3)
 
 	local lbHistoryTitle = AceGUI:Create("Label")
-	lbHistoryTitle:SetText("Local History Information")
+	lbHistoryTitle:SetText(L["Local History Information"])
 	lbHistoryTitle:SetRelativeWidth(0.99)
 	lbHistoryTitle:SetColor(128,0,128)
 	s:AddChild(lbHistoryTitle)
 
 	local lbHeaderID = AceGUI:Create("Label")
-	lbHeaderID:SetText("ID")
+	lbHeaderID:SetText(L["ID"])
 	lbHeaderID:SetRelativeWidth(0.10)
 	lbHeaderID:SetColor(128,0,128)
 	s:AddChild(lbHeaderID)
 
 	local lbHeaderName2 = AceGUI:Create("Label")
-	lbHeaderName2:SetText("Name")
+	lbHeaderName2:SetText(L["Name"])
 	lbHeaderName2:SetRelativeWidth(0.25)
 	lbHeaderName2:SetColor(128,0,128)
 	s:AddChild(lbHeaderName2)
 
 	local lbHeaderChange = AceGUI:Create("Label")
-	lbHeaderChange:SetText("Change")
+	lbHeaderChange:SetText(L["Change"])
 	lbHeaderChange:SetRelativeWidth(0.15)
 	lbHeaderChange:SetColor(128,0,128)
 	s:AddChild(lbHeaderChange)
 
 	local lbHeaderCause = AceGUI:Create("Label")
-	lbHeaderCause:SetText("Cause / Ref")
+	lbHeaderCause:SetText(L["Cause / Ref"])
 	lbHeaderCause:SetRelativeWidth(0.49)
 	lbHeaderCause:SetColor(128,0,128)
 	s:AddChild(lbHeaderCause)
@@ -187,7 +187,7 @@ function GoogleSheetDKP:createActionFrame()
 
 
 	local btCfg = AceGUI:Create("Button")
-	btCfg:SetText("Conf / Imp&Exp / Help")
+	btCfg:SetText(L["Conf / Imp&Exp / Help"])
 	btCfg:SetRelativeWidth(0.5)
 	btCfg:SetCallback("OnClick", function()
 		GoogleSheetDKP.actionframe:Hide()
@@ -196,7 +196,7 @@ function GoogleSheetDKP:createActionFrame()
 	f:AddChild(btCfg)
 
 	local btDKP = AceGUI:Create("Button")
-	btDKP:SetText("DKP Overview")
+	btDKP:SetText(L["DKP Overview"])
 	btDKP:SetRelativeWidth(0.5)
 	btDKP:SetCallback("OnClick", function()
 		GoogleSheetDKP.actionframe:Hide()
@@ -258,14 +258,14 @@ function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
 
 
 	local children = GoogleSheetDKP:ActionFrameTab_master()
-	children["btExecute"]:SetText("Execute " .. group .. " action")
+	children["btExecute"]:SetText(L["Execute group action"](group))
 
 	actionFrameAction = group
 
     if group == "item" then
-		children["lbHeader"]:SetText("/gsdkp item PLAYER DKP ITEM")
-		children["lbAlt1"]:SetText("API: GoogleSheetDKP:Item(player,dkp,item)")
-		children["lbDKP"]:SetText("  For Item, DKP normally is negative")
+		children["lbHeader"]:SetText(L["/gsdkp item PLAYER DKP ITEM"])
+		children["lbAlt1"]:SetText(L["API: GoogleSheetDKP:Item(player,dkp,item)"])
+		children["lbDKP"]:SetText("  " .. L["For Item, DKP normally is negative"])
 
 		actionFrameCause = "Item"
 		children["edCause"]:SetText("Item")
@@ -279,41 +279,41 @@ function GoogleSheetDKP:ActionFrameTabChange(container, event, group)
 		end
 
     elseif group == "raidchange" then
-		children["lbHeader"]:SetText("/gsdkp raidchange DKP CAUSE [COMMENT]")
-		children["lbAlt1"]:SetText("Alternative: /gsdkp raid DKP CAUSE [COMMENT]")
-		children["lbAlt2"]:SetText("API: GoogleSheetDKP:RaidChange(dkp,cause,comment)")
-		children["lbDKP"]:SetText("  You may use negative or positive DKP for changes")
+		children["lbHeader"]:SetText(L["/gsdkp raidchange DKP CAUSE [COMMENT]"])
+		children["lbAlt1"]:SetText(L["Alternative: /gsdkp raid DKP CAUSE [COMMENT]"])
+		children["lbAlt2"]:SetText(L["API: GoogleSheetDKP:RaidChange(dkp,cause,comment)"])
+		children["lbDKP"]:SetText("  " .. L["You may use negative or positive DKP for changes"])
 
-		children["edChar"]:SetText("*ALL raid members*")
+		children["edChar"]:SetText(L["*ALL raid members*"])
 		children["edChar"]:SetDisabled(true)
 		children["ddChar"]:SetDisabled(true)
 
     elseif group == "raidinit" then
-		children["lbHeader"]:SetText("/gsdkp raidinit")
-		children["lbAlt1"]:SetText("Alternative: /gsdkp init")
-		children["lbAlt2"]:SetText("API: GoogleSheetDKP:RaidInit()")
+		children["lbHeader"]:SetText(L["/gsdkp raidinit"])
+		children["lbAlt1"]:SetText(L["Alternative: /gsdkp init"])
+		children["lbAlt2"]:SetText(L["API: GoogleSheetDKP:RaidInit()"])
 
-		children["edChar"]:SetText("*NEW raid members*")
+		children["edChar"]:SetText(L["*NEW raid members*"])
 		children["edChar"]:SetDisabled(true)
 		children["ddChar"]:SetDisabled(true)
 
 		actionFrameDKP = GoogleSheetDKP.db.profile.create_new_dkp
 		children["edDKP"]:SetText(actionFrameDKP)
 		children["edDKP"]:SetDisabled(true)
-		children["lbDKP"]:SetText("  See configuration")
+		children["lbDKP"]:SetText("  " .. L["See configuration"])
 
-		actionFrameCause = "Initial"
+		actionFrameCause = L["Initial"]
 		children["edCause"]:SetText(actionFrameCause)
 		children["edCause"]:SetDisabled(true)
 
-		actionFrameComment = "Initial DKP from GoogleSheetDKP creation"
+		actionFrameComment = L["Initial DKP from GoogleSheetDKP creation"]
 		children["edComment"]:SetText(actionFrameComment)
 		children["edComment"]:SetDisabled(true)
 
 	else -- should only be: elseif group == "change" then
-		children["lbHeader"]:SetText("/gsdkp change PLAYER DKP CAUSE [COMMENT]")
-		children["lbAlt1"]:SetText("API: GoogleSheetDKP:Change(player,dkp,cause,comment)")
-		children["lbDKP"]:SetText("  You may use negative or positive DKP for changes")
+		children["lbHeader"]:SetText(L["/gsdkp change PLAYER DKP CAUSE [COMMENT]"])
+		children["lbAlt1"]:SetText(L["API: GoogleSheetDKP:Change(player,dkp,cause,comment)"])
+		children["lbDKP"]:SetText("  " .. L["You may use negative or positive DKP for changes"])
 
     end
 
@@ -334,24 +334,24 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	local children = {}
 
 	local lbHeader = AceGUI:Create("Heading")
-	lbHeader:SetText("/gsdkp attendance ['delete']")
+	lbHeader:SetText(L["/gsdkp attendance ['delete']"])
 	lbHeader:SetRelativeWidth(1.0)
 	children["lbHeader"] = lbHeader
 
 	local lbAlt1 = AceGUI:Create("Label")
-	lbAlt1:SetText("Alternative: /gsdkp attend ['delete']")
+	lbAlt1:SetText(L["Alternative: /gsdkp attend ['delete']"])
 	lbAlt1:SetRelativeWidth(1.0)
 	children["lbAlt1"] = lbAlt1
 
 	local lbAlt2 = AceGUI:Create("Label")
-	lbAlt2:SetText("API: GoogleSheetDKP:Attendance(['delete'])")
+	lbAlt2:SetText(L["API: GoogleSheetDKP:Attendance(['delete'])"])
 	lbAlt2:SetRelativeWidth(1.0)
 	children["lbAlt2"] = lbAlt2
 
 	local cbDeletion = AceGUI:Create("CheckBox")
 	cbDeletion:SetType("checkbox")
 	cbDeletion:SetValue(actionFrameDeletion)
-	cbDeletion:SetLabel("delete")
+	cbDeletion:SetLabel(L["delete"])
 	cbDeletion:SetRelativeWidth(1.0)
 	cbDeletion:SetCallback("OnValueChanged", function(widget, event, value)
 		actionFrameDeletion = widget:GetValue()
@@ -359,7 +359,7 @@ function GoogleSheetDKP:ActionFrameTab_attendance(container)
 	children["cbDeletion"] = cbDeletion
 
 	local btExecute = AceGUI:Create("Button")
-	btExecute:SetText("Execute Action")
+	btExecute:SetText(L["Execute Action"])
 	btExecute:SetRelativeWidth(1.0)
 	btExecute:SetCallback("OnClick", function()
 		GoogleSheetDKP:executeActionFrameAction()
@@ -389,11 +389,11 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 
 	local edChar = AceGUI:Create("EditBox")
 	edChar:SetText(actionFrameUser)
-	edChar:SetLabel("User")
+	edChar:SetLabel(L["User"])
 	edChar:SetRelativeWidth(0.5)
 	edChar:SetCallback("OnEnterPressed", function(widget)
 		if widget:GetText() == nil or widget:GetText() == "" then
-			GoogleSheetDKP:Print("You have to give a username")
+			GoogleSheetDKP:Print(L["You have to give a username"])
 			widget:SetText(actionFrameUser)
 			widget:ClearFocus()
 			return nil
@@ -404,7 +404,7 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 	children["edChar"] = edChar
 
 
-	local raiderlist = { manual_select = "-choose manually-" }
+	local raiderlist = { manual_select = L["-choose manually-"] }
 	for i = 1, GetNumGroupMembers() do
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
 		raiderlist[name] = name
@@ -423,7 +423,7 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 	ddChar:SetList(raiderlist)
 	ddChar:SetValue(preselect)
 	ddChar:SetText(raiderlist[preselect])
-	ddChar:SetLabel("Character")
+	ddChar:SetLabel(L["Character"])
 	ddChar:SetRelativeWidth(0.5)
 	ddChar:SetCallback("OnValueChanged", function(widget, event, key)
 		if key ~= "manual_select" then
@@ -436,13 +436,13 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 
 	local edDKP = AceGUI:Create("EditBox")
 	edDKP:SetText(actionFrameDKP)
-	edDKP:SetLabel("DKP charge")
+	edDKP:SetLabel(L["DKP charge"])
 	edDKP:SetRelativeWidth(0.5)
 	edDKP:SetCallback("OnEnterPressed", function(widget)
 		local newdkp = widget:GetText()
 
 		if newdkp == nil then
-			GoogleSheetDKP:Print("Can only set numeric values for DKP")
+			GoogleSheetDKP:Print(L["Can only set numeric values for DKP"])
 			widget:SetText(actionFrameDKP)
 			widget:ClearFocus()
 			return nil
@@ -450,7 +450,7 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 
 		newdkp = tonumber(newdkp)
 		if newdkp == nil then
-			GoogleSheetDKP:Print("Can only set numeric values for DKP")
+			GoogleSheetDKP:Print(L["Can only set numeric values for DKP"])
 			widget:SetText(actionFrameDKP)
 			widget:ClearFocus()
 			return nil
@@ -468,18 +468,18 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 
 	local edCause = AceGUI:Create("EditBox")
 	edCause:SetText(actionFrameCause)
-	edCause:SetLabel("Cause")
+	edCause:SetLabel(L["Cause"])
 	edCause:SetRelativeWidth(1.0)
 	edCause:SetCallback("OnEnterPressed", function(widget)
 		local newcause = widget:GetText()
 		if newcause == nil or newcause == "" then
-			GoogleSheetDKP:Print("You have to give a cause")
+			GoogleSheetDKP:Print(L["You have to give a cause"])
 			widget:SetText(actionFrameCause)
 			widget:ClearFocus()
 			return nil
 		end
 		if strfind(newcause, "%s") then
-			GoogleSheetDKP:Print("Cause can only be one word")
+			GoogleSheetDKP:Print(L["Cause can only be one word"])
 			widget:SetText(actionFrameCause)
 			widget:ClearFocus()
 			return nil
@@ -492,12 +492,12 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 	local edComment = AceGUI:Create("EditBox")
 	edComment.optional = true
 	edComment:SetText(actionFrameComment)
-	edComment:SetLabel("Comment (optional)")
+	edComment:SetLabel(L["Comment (optional)"])
 	edComment:SetRelativeWidth(1.0)
 	edComment:SetCallback("OnEnterPressed", function(widget)
 		local newcomment = widget:GetText()
 		if (not widget.optional) and (newcomment == nil or newcomment == "") then
-			GoogleSheetDKP:Print("You have to enter a value")
+			GoogleSheetDKP:Print(L["You have to enter a value"])
 			widget:SetText(actionFrameComment)
 			widget:ClearFocus()
 		end
@@ -507,7 +507,7 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 	children["edComment"] = edComment
 
 	local btExecute = AceGUI:Create("Button")
-	btExecute:SetText("Execute Action")
+	btExecute:SetText(L["Execute Action"])
 	btExecute:SetRelativeWidth(1.0)
 	btExecute:SetCallback("OnClick", function()
 		GoogleSheetDKP:executeActionFrameAction()

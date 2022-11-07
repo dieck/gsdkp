@@ -56,7 +56,7 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 					local yes = function() GoogleSheetDKP:sendSyncRequest() GoogleSheetDKP.resyncFrame:Hide() GoogleSheetDKP.syncRequestTimer = nil end
 					local no = function() GoogleSheetDKP.resyncFrame:Hide() end
 					if GoogleSheetDKP.latestSeenRemoteData < GoogleSheetDKP.db.profile.historytimestamp then
-						GoogleSheetDKP.resyncFrame = GoogleSheetDKP:createTwoDialogFrame("Newer data", "Newer data is available at other users. Request sync?", "Yes", yes, "No", no)
+						GoogleSheetDKP.resyncFrame = GoogleSheetDKP:createTwoDialogFrame(L["Newer data"], L["Newer data is available at other users. Request sync?"], L["Yes"], yes, L["No"], no)
 						GoogleSheetDKP.resyncFrame:Show()
 					end
 				end, 10)
@@ -106,7 +106,7 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 			GoogleSheetDKP.db.profile.ignoreSender[widget.parent.paramSender] = time()
 		end
 
-		local f = GoogleSheetDKP:createTwoDialogFrame("Incoming Data", sender .. " has send a dkp change.", "Accept Sender for 4 hours", accept, "Ignore Sender for 4 hours", ignore)
+		local f = GoogleSheetDKP:createTwoDialogFrame(L["Incoming Data"], L["sender has send a dkp change."](sender), L["Accept Sender for 4 hours"], accept, L["Ignore Sender for 4 hours"], ignore)
 		f.paramPrefix = prefix
 		f.paramMessage = message
 		f.paramDistribution = distribution
@@ -164,13 +164,13 @@ function GoogleSheetDKP:handleSyncOffer()
 			widget.parent:Hide()
 		end
 
-		local txt = sender .. " has offered full DKP list."
+		local txt = L["sender has offered full DKP list."](sender)
 
 		if GoogleSheetDKP.db.profile.historytimestamp > d["historytimestamp"] then
-			txt = txt .. " WARNING: DATA IS OLDER THAN EXISTING."
+			txt = txt .. " " .. L["WARNING: DATA IS OLDER THAN EXISTING."]
 		end
 
-		local f = GoogleSheetDKP:createTwoDialogFrame("Incoming Data", txt, "Accept", accept, "Decline", decline)
+		local f = GoogleSheetDKP:createTwoDialogFrame(L["Incoming Data"], txt, L["Accept"], accept, L["Decline"], decline)
 		f.paramSender = sender
 		f:Show()
 	end
