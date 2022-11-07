@@ -273,7 +273,10 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent, dt, tm, com
 		if GoogleSheetDKP.db.profile.create_new_users then
 			GoogleSheetDKP.db.profile.current[name] = 0
 			GoogleSheetDKP:Print("New user " .. name .. " added.")
-			GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", silent, commSender)
+			if not commSender then
+				-- do not create new users for API-incoming: first entry WILL BE INITIAL anyway!
+				GoogleSheetDKP:Change(name, GoogleSheetDKP.db.profile.create_new_dkp, "Initial", "Initial DKP from GoogleSheetDKP creation", silent, commSender)
+			end
 		else
 			GoogleSheetDKP:Print(L["User name unknown and new user creation is not allowed."](name))
 			return nil
@@ -312,7 +315,7 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent, dt, tm, com
 	local hist = L["New DKP entry [id]: change DKP to name for cause / comment (has now newdkp DKP)"](GoogleSheetDKP.db.profile.nexthistory, change, name, cause, comment, newdkp)
 
 	if commSender then
-		GoogleSheetDKP:Print(hist .. " " .. L["(by API from " .. commSender .. ")"])
+		GoogleSheetDKP:Print(hist .. " " .. L["(by API from commSender)"](commSender))
 	else
 		GoogleSheetDKP:Print(hist)
 

@@ -102,13 +102,15 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 		-- else request and handle later
 		local accept = function(widget)
 			GoogleSheetDKP.db.profile.acceptSender[widget.parent.paramSender] = time()
-			GoogleSheetDKP:OnCommReceived(widget.parent.paramPrefix, widget.parent.paramMessage, widget.parent.paramDistribution, widget.parent.paramSender)
+			local data = widget.parent.paramData
+			GoogleSheetDKP:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], widget.parent.paramSender)
 		end
 		local ignore = function(widget)
 			GoogleSheetDKP.db.profile.ignoreSender[widget.parent.paramSender] = time()
 		end
 
 		local f = GoogleSheetDKP:createTwoDialogFrame(L["Incoming Data"], L["sender has send a dkp change."](sender), L["Accept Sender for 4 hours"], accept, L["Ignore Sender for 4 hours"], ignore)
+		f.paramData = d["data"]
 		f.paramPrefix = prefix
 		f.paramMessage = message
 		f.paramDistribution = distribution
