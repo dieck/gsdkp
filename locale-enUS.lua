@@ -11,7 +11,7 @@ L["Debug"] = "Debug"
 L["Usage: |cFF00CCFF/dmb |cFFA335EE[Sword of a Thousand Truths]|r to start a bid"] = "Usage: |cFF00CCFF/dmb |cFFA335EE[Sword of a Thousand Truths]|r to start a bid"
 L["Usage: |cFF00CCFF/dmb config|r to open the configuration window"] = "Usage: |cFF00CCFF/dmb config|r to open the configuration window"
 
--- load default outputs 
+-- load default outputs
 for k,v in pairs(GoogleSheetDKP.outputLocales["enUS"]) do L[k] = v end
 
 end -- if L then

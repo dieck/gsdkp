@@ -12,7 +12,7 @@ Import from Current DKP Sheet to Addon, and Export from Addon to History Sheet, 
 
 ## Tab "History"
 
-Header: 
+Header:
 ID \t Date \t Name \t Change \t Cause \t Reference
 
 e.g.
@@ -22,11 +22,11 @@ e.g.
 ## Tab Current
 
 Header:
-Playername \t Main \t Current [$MAX(ROWID)] \t All Time Gain \t Items 
+Playername \t Main \t Current [$MAX(ROWID)] \t All Time Gain \t Items
 
 e.g.
 
-Roguetwink \t Warriormain \t 120 \t 220 \t 50 
+Roguetwink \t Warriormain \t 120 \t 220 \t 50
 
 The "Current" header includes an import thing: the max rowid from the history tab.
 Following entries will then continue from there, to avoid doublettes.
@@ -37,10 +37,10 @@ Currently, GoogleSheetDKP only supports DKP by character, the Main field is ther
 
 ## Usage
 
-  /gsdkp 
-Opens the overview 
+  /gsdkp
+Opens the overview
 
-  /gsdkp config 
+  /gsdkp config
 Configuration options including Import, Export and Help
 
   /gsdkp change NAME VALUE CAUSE [COMMENT]
@@ -55,7 +55,7 @@ For Items, please note value will *not* be negated! (use e.g. -10 for costs)
 
 takes raid attendance, will be used on next raidchange, if not deleted before that
 
-  
+
 
 
 ## Notification

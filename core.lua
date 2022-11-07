@@ -12,20 +12,20 @@ local defaults = {
 	negative_allowed = false,
 	create_new_users = true,
 	create_new_dkp = 100,
-	remind_attendance = yes,
+	remind_attendance = true,
   }
 }
 
 GoogleSheetDKP.gsdkpOptionsTable = {
 	type = "group",
 	args = {
-		grpconfig = {    
+		grpconfig = {
 			type = "group",
 			name = "Config",
 			args = {
-			
+
 				hdrquery = { type = "header", name = "Queries", order = 100 },
-		
+
 				qryraid = {
 					name = "Raid",
 					desc = "Accept queries for current DKP and list from Raid members",
@@ -47,7 +47,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline121 = { name="", type="description", order=121 },
 
 				hdroutput = { type = "header", name = "Output", order = 200 },
-		
+
 				outraid = {
 					name = "Raid",
 					desc = "Output DKP changes to Raid",
@@ -67,19 +67,19 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 					get = function(info) return GoogleSheetDKP.db.profile.output_user end,
 				},
 				newline221 = { name="", type="description", order=221 },
-			
+
 				outputlanguage = {
 					name = L["Language"],
 					desc = L["Language for outputs"],
 					type = "select",
 					order = 230,
 					values = function()
-						r = {}
+						local r = {}
 						for k,v in pairs(GoogleSheetDKP.outputLocales) do r[k] = k end
 						return r
 					end,
 					set = function(info,val)
-						GoogleSheetDKP.db.profile.outputlanguage = val 
+						GoogleSheetDKP.db.profile.outputlanguage = val
 						for k,v in pairs(GoogleSheetDKP.outputLocales[val]) do L[k] = v end
 					end,
 					get = function(info) return GoogleSheetDKP.db.profile.outputlanguage end,
@@ -128,7 +128,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				},
 				newline331 = { name="", type="description", order=331 },
 				note332 = { name="Capture Chat log for easier resolve of disputes and discussions about DKP after a raid", type="description", order=332 },
-			
+
 				attendance = {
 					name = "Attendence reminder",
 					desc = "Remind to store attendance for later Raid DKP assignment",
@@ -140,12 +140,12 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline341 = { name="", type="description", order=341 },
 			},
 		},
-		
+
 		grpimport = {
 			type = "group",
 			name = "Import",
 			args = {
-			
+
 				note108 = { name="Copy & paste full Current DKP Tab from Google Doc here, including headers", type="description", order=108 },
 				newline109 = { name="", type="description", order=109 },
 				import = {
@@ -162,10 +162,10 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				newline111 = { name="", type="description", order=51 },
 				note112 = { name="Be aware that the DKP table will be OVERWRITTEN and existing changes DELETED!", type="description", order=112 },
 				note113 = { name="Export first, if you have current data!", type="description", order=113 },
-			
+
 			}
 		},
-		
+
 		grpexport = {
 			type = "group",
 			name = "Export",
@@ -186,13 +186,13 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 
 			}
 		},
-		
+
 		grphelp = {
 			type = "group",
 			name = "Help",
 			order = 800,
 			args = {
-				
+
 				n01 = { order=01, type="description", name="Quickstart:" },
 				n02 = { order=02, type="description", name="Copy Template https://bit.ly/GoogleSheetDKP" },
 				n03 = { order=03, type="description", name="Import from Current DKP tab, Export to History Tab" },
@@ -221,7 +221,7 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 				n25 = { order=25, type="description", name="GoogleSheetDKP:RaidAttendance(['delete'])" },
 			}
 		},
-		
+
 		debugging = {
 		  name = L["Debug"],
 		  type = "toggle",
@@ -239,34 +239,34 @@ function GoogleSheetDKP:OnInitialize()
 
   LibStub("AceConfig-3.0"):RegisterOptionsTable("GoogleSheetDKP", self.gsdkpOptionsTable)
   self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GoogleSheetDKP", "GoogleSheetDKP")
-  
+
   -- interaction from raid members
   self:RegisterEvent("CHAT_MSG_WHISPER")
- 
+
   self:RegisterChatCommand("gsdkp", "ChatCommand")
 
   self.onetimes = {}
-  
+
   -- change default output language if configured
   if GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage] ~= nil then
 	for k,v in pairs(GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage]) do L[k] = v end
   end
-  
+
   if GoogleSheetDKP.db.profile.nexthistory == nil then GoogleSheetDKP.db.profile.nexthistory = 1 end
   if GoogleSheetDKP.db.profile.history == nil then GoogleSheetDKP.db.profile.history = {} end
   if GoogleSheetDKP.db.profile.current == nil then GoogleSheetDKP.db.profile.current = {} end
-  
+
   -- for "later" option, will be compared against time()
   self.attendancereminder = 0
-  
+
   if self.db.profile.raidattendance_taken == nil then self.db.profile.raidattendance_taken = 0 end
-  
+
   -- remove stored attendance if older than 12 hours
   if self.db.profile.raidattendance_taken + 12*60*60 < time() then
 	self.db.profile.raidattendance = nil
 	self.db.profile.raidattendance_taken = 0
   end
-  
+
 end
 
 function GoogleSheetDKP:OnEnable()
@@ -283,17 +283,17 @@ function GoogleSheetDKP:ChatCommand(inc)
 	if strtrim(inc) == "config" or strtrim(inc) == "conf" then
 		LibStub("AceConfigDialog-3.0"):Open("GoogleSheetDKP")
 		return true
-		
+
 	elseif strtrim(inc) == "" then
 		GoogleSheetDKP.dkpframe = GoogleSheetDKP:createDKPFrame()
 		return true
-		
+
 	else
 		-- condense multiple spaces
 		local incs = string.gsub(strtrim(inc), "%s%s+", " ")
 		local cmd = strsplit(" ", incs)
-				
-		if cmd == nil then 
+
+		if cmd == nil then
 			-- do nothing
 			return false
 
@@ -305,7 +305,7 @@ function GoogleSheetDKP:ChatCommand(inc)
 			local _, name, change, item = strsplit(" ", incs, 4)
 			GoogleSheetDKP:Item(name, change, item)
 			return true
-			
+
 		elseif cmd == "init" or cmd == "raidinit" then
 			GoogleSheetDKP:RaidInit()
 			return true
@@ -319,12 +319,12 @@ function GoogleSheetDKP:ChatCommand(inc)
 			local _, deletion = strsplit(" ", incs, 2)
 			GoogleSheetDKP:Attendance(deletion)
 			return true
-			
+
 		elseif cmd == "change" then
 			local _, name, change, cause, comment = strsplit(" ", incs, 5)
-			GoogleSheetDKP:Change(name, change, cause, comment)		
+			GoogleSheetDKP:Change(name, change, cause, comment)
 			return true
-		
+
 		end
 
 	end
@@ -333,7 +333,7 @@ function GoogleSheetDKP:ChatCommand(inc)
 end
 
 
-function GoogleSheetDKP:Debug(t) 
+function GoogleSheetDKP:Debug(t)
 	if (GoogleSheetDKP.db.profile.debug) then
 		GoogleSheetDKP:Print("GoogleSheetDKP DEBUG: " .. t)
 	end
