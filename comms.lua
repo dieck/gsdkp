@@ -194,7 +194,6 @@ function GoogleSheetDKP:sendSyncRequest()
 	}
 	GoogleSheetDKP:Debug("send sync request " .. commmsg["uuid"])
 	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
-	if GoogleSheetDKP.db.profile.debug then GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "GUILD", nil, "NORMAL") end
 end
 
 function GoogleSheetDKP:sendSyncOffer()
@@ -209,7 +208,6 @@ function GoogleSheetDKP:sendSyncOffer()
 	}
 	GoogleSheetDKP:Debug("send sync offer " .. commmsg["uuid"])
 	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
-	if GoogleSheetDKP.db.profile.debug then GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "GUILD", nil, "NORMAL") end
 end
 
 function GoogleSheetDKP:sendChange(data)
@@ -223,5 +221,4 @@ function GoogleSheetDKP:sendChange(data)
 	}
 	GoogleSheetDKP:Debug("send sync change " .. commmsg["uuid"])
 	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
-	if GoogleSheetDKP.db.profile.debug then GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "GUILD", nil, "NORMAL") end
 end

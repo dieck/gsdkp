@@ -1,4 +1,4 @@
-## Interface: 20503
+## Interface: 30400
 ## Title: GoogleSheetDKP
 ## Notes: Simple interface for using DKP with a google sheet
 ## Author: dieck
