@@ -4,8 +4,8 @@ local AceGUI = LibStub("AceGUI-3.0")
 GoogleSheetDKP.dkpframe = nil
 
 function GoogleSheetDKP:createDKPFrame()
-	if GoogleSheetDKP.db.profile.current == nil then
-		GoogleSheetDKP:Print(L["No current DKP information."])
+	if self.db.profile.current == nil then
+		self:Print(L["No current DKP information."])
 		return;
 	end
 
@@ -25,8 +25,8 @@ function GoogleSheetDKP:createDKPFrame()
 	local btCfg = AceGUI:Create("Button")
 	btCfg:SetText(L["Conf / Imp&Exp / Help"])
 	btCfg:SetRelativeWidth(0.5)
-	btCfg:SetCallback("OnClick", function()
-		GoogleSheetDKP.dkpframe:Hide()
+	btCfg:SetCallback("OnClick", function(widget)
+		widget.parent:Hide()
 		LibStub("AceConfigDialog-3.0"):Open("GoogleSheetDKP")
 	end)
 	f:AddChild(btCfg)
@@ -34,8 +34,8 @@ function GoogleSheetDKP:createDKPFrame()
 	local btAction = AceGUI:Create("Button")
 	btAction:SetText(L["Actions"])
 	btAction:SetRelativeWidth(0.5)
-	btAction:SetCallback("OnClick", function()
-		GoogleSheetDKP.dkpframe:Hide()
+	btAction:SetCallback("OnClick", function(widget)
+		widget.parent:Hide()
 		GoogleSheetDKP.actionframe = GoogleSheetDKP:createActionFrame()
 	end)
 	f:AddChild(btAction)
@@ -409,8 +409,8 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
 		raiderlist[name] = name
 
-		if GoogleSheetDKP.db.profile.current[name] then
-			raiderlist[name] = name .. " (" .. GoogleSheetDKP.db.profile.current[name] .. ")"
+		if self.db.profile.current[name] then
+			raiderlist[name] = name .. " (" .. self.db.profile.current[name] .. ")"
 		end
 	end
 
@@ -522,21 +522,21 @@ function GoogleSheetDKP:executeActionFrameAction()
 	local res = nil
 
 	if actionFrameAction == 'raidinit' then
-		res = GoogleSheetDKP:RaidInit()
+		res = self:RaidInit()
 	elseif actionFrameAction == 'raidchange' then
-		res = GoogleSheetDKP:RaidChange(actionFrameDKP, actionFrameCause, actionFrameComment)
+		res = self:RaidChange(actionFrameDKP, actionFrameCause, actionFrameComment)
 	elseif actionFrameAction == 'item' then
-		res = GoogleSheetDKP:Item(actionFrameUser, actionFrameDKP, actionFrameComment)
+		res = self:Item(actionFrameUser, actionFrameDKP, actionFrameComment)
 	elseif actionFrameAction == 'attendance' then
 		if actionFrameDeletion then
-			res = GoogleSheetDKP:Attendance("delete")
+			res = self:Attendance("delete")
 		else
-			res = GoogleSheetDKP:Attendance()
+			res = self:Attendance()
 		end
 	else --elseif actionFrameAction == 'change' then
-		res = GoogleSheetDKP:Change(actionFrameUser, actionFrameDKP, actionFrameCause, actionFrameComment)
+		res = self:Change(actionFrameUser, actionFrameDKP, actionFrameCause, actionFrameComment)
 	end
 
-	if res then GoogleSheetDKP.actionframe:Hide() end
+	if res then self.actionframe:Hide() end
 end
 

@@ -326,14 +326,14 @@ function GoogleSheetDKP:OnInitialize()
 	self.onetimes = {}
 
 	-- change default output language if configured
-	if GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage] ~= nil then
-		for k,v in pairs(GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage]) do L[k] = v end
+	if self.outputLocales[self.db.profile.outputlanguage] ~= nil then
+		for k,v in pairs(self.outputLocales[self.db.profile.outputlanguage]) do L[k] = v end
 	end
 
-	if GoogleSheetDKP.db.profile.nexthistory == nil then GoogleSheetDKP.db.profile.nexthistory = 1 end
-	if GoogleSheetDKP.db.profile.historytimestamp == nil then GoogleSheetDKP.db.profile.historytimestamp = 0 end
-	if GoogleSheetDKP.db.profile.history == nil then GoogleSheetDKP.db.profile.history = {} end
-	if GoogleSheetDKP.db.profile.current == nil then GoogleSheetDKP.db.profile.current = {} end
+	if self.db.profile.nexthistory == nil then self.db.profile.nexthistory = 1 end
+	if self.db.profile.historytimestamp == nil then self.db.profile.historytimestamp = 0 end
+	if self.db.profile.history == nil then self.db.profile.history = {} end
+	if self.db.profile.current == nil then self.db.profile.current = {} end
 
 	-- for "later" option, will be compared against time()
 	self.attendancereminder = 0
@@ -346,13 +346,13 @@ function GoogleSheetDKP:OnInitialize()
 		self.db.profile.raidattendance_taken = 0
 	end
 
-	if not GoogleSheetDKP.db.profile.ignoreSender then GoogleSheetDKP.db.profile.ignoreSender = {} end
-	if not GoogleSheetDKP.db.profile.acceptSender then GoogleSheetDKP.db.profile.acceptSender = {} end
+	if not self.db.profile.ignoreSender then self.db.profile.ignoreSender = {} end
+	if not self.db.profile.acceptSender then self.db.profile.acceptSender = {} end
 
-	GoogleSheetDKP.latestSyncOfferTime = 0
-	GoogleSheetDKP.latestSyncOfferAccept = {}
+	self.latestSyncOfferTime = 0
+	self.latestSyncOfferAccept = {}
 
-	GoogleSheetDKP.commUUIDseen = {}
+	self.commUUIDseen = {}
 end
 
 function GoogleSheetDKP:OnEnable()
@@ -364,14 +364,14 @@ function GoogleSheetDKP:OnEnable()
 
 	self:RegisterChatCommand("gsdkp", "ChatCommand")
 
-	self:RegisterComm(GoogleSheetDKP.commPrefix, "OnCommReceived")
-	self:RegisterComm(GoogleSheetDKP.commPrefixCSLS, "OnCommReceivedCSLS")
+	self:RegisterComm(self.commPrefix, "OnCommReceived")
+	self:RegisterComm(self.commPrefixCSLS, "OnCommReceivedCSLS")
 
-	if not GoogleSheetDKP.db.profiles.properlyEnded then
-		GoogleSheetDKP:Debug("Error: not properly ended. Will request information")
-		GoogleSheetDKP:askToRequestSyncCrash()
+	if not self.db.profiles.properlyEnded then
+		self:Debug("Error: not properly ended. Will request information")
+		self:askToRequestSyncCrash()
 	end
-	GoogleSheetDKP.db.profiles.properlyEnded = false
+	self.db.profiles.properlyEnded = false
 end
 
 function GoogleSheetDKP:OnDisable()
@@ -384,7 +384,7 @@ end
 function GoogleSheetDKP:PLAYER_LOGOUT()
 	-- event is called just before variables are saved
 	-- and we need this variable to be saved ;)
-	GoogleSheetDKP.db.profiles.properlyEnded = true
+	self.db.profiles.properlyEnded = true
 end
 
 function GoogleSheetDKP:ChatCommand(inc)
@@ -394,7 +394,7 @@ function GoogleSheetDKP:ChatCommand(inc)
 		return true
 
 	elseif strtrim(inc) == "" then
-		GoogleSheetDKP.dkpframe = GoogleSheetDKP:createDKPFrame()
+		self.dkpframe = self:createDKPFrame()
 		return true
 
 	else
@@ -407,31 +407,31 @@ function GoogleSheetDKP:ChatCommand(inc)
 			return false
 
 		elseif cmd == "action" then
-			GoogleSheetDKP.actionframe = GoogleSheetDKP:createActionFrame()
+			self.actionframe = self:createActionFrame()
 			return true
 
 		elseif cmd == "item" then
 			local _, name, change, item = strsplit(" ", incs, 4)
-			GoogleSheetDKP:Item(name, change, item)
+			self:Item(name, change, item)
 			return true
 
 		elseif cmd == "init" or cmd == "raidinit" then
-			GoogleSheetDKP:RaidInit()
+			self:RaidInit()
 			return true
 
 		elseif cmd == "raid" or cmd == "raidchange" then
 			local _, change, cause, comment = strsplit(" ", incs, 4)
-			GoogleSheetDKP:RaidChange(change, cause, comment)
+			self:RaidChange(change, cause, comment)
 			return true
 
 		elseif cmd == "attendance" or cmd == "attend" then
 			local _, deletion = strsplit(" ", incs, 2)
-			GoogleSheetDKP:Attendance(deletion)
+			self:Attendance(deletion)
 			return true
 
 		elseif cmd == "change" then
 			local _, name, change, cause, comment = strsplit(" ", incs, 5)
-			GoogleSheetDKP:Change(name, change, cause, comment)
+			self:Change(name, change, cause, comment)
 			return true
 
 		end
@@ -443,8 +443,8 @@ end
 
 
 function GoogleSheetDKP:Debug(t)
-	if (GoogleSheetDKP.db.profile.debug) then
-		GoogleSheetDKP:Print("GoogleSheetDKP DEBUG: " .. t)
+	if (self.db.profile.debug) then
+		self:Print("GoogleSheetDKP DEBUG: " .. t)
 	end
 end
 

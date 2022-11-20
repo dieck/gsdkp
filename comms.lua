@@ -9,57 +9,56 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 	if sender == UnitName("player") then return end
 
 	-- d = deserialized
-	local success, d = GoogleSheetDKP:Deserialize(message);
+	local success, d = self:Deserialize(message);
 
 	-- every thing else get handled if (if not disabled)
 	if not success then
-		GoogleSheetDKP:Debug("ERROR: " .. distribution .. " message from " .. sender .. ": cannot be deserialized")
+		self:Debug("ERROR: " .. distribution .. " message from " .. sender .. ": cannot be deserialized")
 		return
 	end
 
-	if GoogleSheetDKP.commUUIDseen[d["uuid"]] then
-		GoogleSheetDKP:Debug("received comm " .. d["uuid"] .. ": already seen, ignoring " .. d["command"] .. " from " .. sender)
+	if self.commUUIDseen[d["uuid"]] then
+		self:Debug("received comm " .. d["uuid"] .. ": already seen, ignoring " .. d["command"] .. " from " .. sender)
 		return
 	end
-	GoogleSheetDKP.commUUIDseen[d["uuid"]] = time()
+	self.commUUIDseen[d["uuid"]] = time()
 	
-	GoogleSheetDKP:Debug("received comm " .. d["uuid"] .. ": " .. d["command"] .. " from " .. sender)
+	self:Debug("received comm " .. d["uuid"] .. ": " .. d["command"] .. " from " .. sender)
 
 
 	local fourhoursago = time() - 4*60*60
 
 	-- remove entries that are too old
-	if GoogleSheetDKP.db.profile.ignoreSender[sender] and GoogleSheetDKP.db.profile.ignoreSender[sender] < fourhoursago then
-		GoogleSheetDKP.db.profile.ignoreSender[sender] = nil
+	if self.db.profile.ignoreSender[sender] and self.db.profile.ignoreSender[sender] < fourhoursago then
+		self.db.profile.ignoreSender[sender] = nil
 	end
-	if GoogleSheetDKP.db.profile.acceptSender[sender] and GoogleSheetDKP.db.profile.acceptSender[sender] < fourhoursago then
-		GoogleSheetDKP.db.profile.acceptSender[sender] = nil
+	if self.db.profile.acceptSender[sender] and self.db.profile.acceptSender[sender] < fourhoursago then
+		self.db.profile.acceptSender[sender] = nil
 	end
 
 
 	if d["command"] == "SYNC_REQUEST" then
-		GoogleSheetDKP.latestSeenRemoteData = d["historytimestamp"]
+		self.latestSeenRemoteData = d["historytimestamp"]
 
 		-- send offer if my data is newer
-		if GoogleSheetDKP.db.profile.historytimestamp > d["historytimestamp"] or GoogleSheetDKP.db.profile.nexthistory > d["nexthistory"] then
-			GoogleSheetDKP:sendSyncOffer()
+		if self.db.profile.historytimestamp > d["historytimestamp"] or self.db.profile.nexthistory > d["nexthistory"] then
+			self:sendSyncOffer()
 
 		else
-			GoogleSheetDKP:Debug("Got SYNC_REQUEST, but my data is not newer, so I won't answer. "
-				.. tostring(GoogleSheetDKP.db.profile.historytimestamp) .. " vs. " .. tostring(d["historytimestamp"]) .. " // "
-				.. tostring(GoogleSheetDKP.db.profile.nexthistory) .. " vs. " .. tostring(d["nexthistory"]) )
+			self:Debug("Got SYNC_REQUEST, but my data is not newer, so I won't answer. "
+				.. tostring(self.db.profile.historytimestamp) .. " vs. " .. tostring(d["historytimestamp"]) .. " // "
+				.. tostring(self.db.profile.nexthistory) .. " vs. " .. tostring(d["nexthistory"]) )
 
-			--debug GoogleSheetDKP:sendSyncOffer()
+			--debug self:sendSyncOffer()
 
 
 			-- if I don't find an even newer OFFER during the next 10sec, I should ask my user if they want to get this offer from the original sender
-			if not GoogleSheetDKP.syncRequestTimer then
-				GoogleSheetDKP.syncRequestTimer = GoogleSheetDKP:ScheduleTimer(function()
+			if not self.syncRequestTimer then
+				self.syncRequestTimer = self:ScheduleTimer(function()
 					local yes = function() GoogleSheetDKP:sendSyncRequest() GoogleSheetDKP.resyncFrame:Hide() GoogleSheetDKP.syncRequestTimer = nil end
 					local no = function() GoogleSheetDKP.resyncFrame:Hide() end
 					if GoogleSheetDKP.latestSeenRemoteData < GoogleSheetDKP.db.profile.historytimestamp then
 						GoogleSheetDKP.resyncFrame = GoogleSheetDKP:createTwoDialogFrame(L["Newer data"], L["Newer data is available at other users. Request sync?"], L["Yes"], yes, L["No"], no)
-						GoogleSheetDKP.resyncFrame:Show()
 					end
 				end, 10)
 			end
@@ -69,47 +68,47 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 
 
 	if d["command"] == "SYNC_OFFER" then
-		GoogleSheetDKP.latestSeenRemoteData = d["historytimestamp"]
+		self.latestSeenRemoteData = d["historytimestamp"]
 
 		-- if sender is already ignore: do nothing
-		if GoogleSheetDKP.db.profile.ignoreSender[sender] then return end
+		if self.db.profile.ignoreSender[sender] then return end
 
 		-- if sender is whitelisted or not seen before:
 		-- wait for 10 seconds for other incoming offers, and present the newest one to accept
-		if d["historytimestamp"] > GoogleSheetDKP.latestSyncOfferTime then
-			GoogleSheetDKP.latestSyncOfferTime = d["historytimestamp"]
-			GoogleSheetDKP.latestSyncOffer = { d = d, sender = sender }
+		if d["historytimestamp"] > self.latestSyncOfferTime then
+			self.latestSyncOfferTime = d["historytimestamp"]
+			self.latestSyncOffer = { d = d, sender = sender }
 		end
 
-		if not GoogleSheetDKP.syncOfferTimer then
-			GoogleSheetDKP.syncOfferTimer = GoogleSheetDKP:ScheduleTimer(GoogleSheetDKP.handleSyncOffer, 10)
+		if not self.syncOfferTimer then
+			self.syncOfferTimer = self:ScheduleTimer(self.handleSyncOffer, 10)
 		end
 
 	end
 
 	if d["command"] == "CHANGE" then
 		-- if sender is already ignore: do nothing
-		if GoogleSheetDKP.db.profile.ignoreSender[sender] then return end
+		if self.db.profile.ignoreSender[sender] then return end
 
 		-- if sender is already whitelisted: accept and store
-		if GoogleSheetDKP.db.profile.acceptSender[sender] then
-			GoogleSheetDKP:Debug("Received CHANGE from accepted users, will enter.")
+		if self.db.profile.acceptSender[sender] then
+			self:Debug("Received CHANGE from accepted users, will enter.")
 			local data = d["data"]
-			GoogleSheetDKP:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], sender)
+			self:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], sender)
 			return
 		end
 
 		-- else request and handle later
 		local accept = function(widget)
-			GoogleSheetDKP.db.profile.acceptSender[widget.parent.paramSender] = time()
+			self.db.profile.acceptSender[widget.parent.paramSender] = time()
 			local data = widget.parent.paramData
-			GoogleSheetDKP:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], widget.parent.paramSender)
+			self:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], widget.parent.paramSender)
 		end
 		local ignore = function(widget)
-			GoogleSheetDKP.db.profile.ignoreSender[widget.parent.paramSender] = time()
+			self.db.profile.ignoreSender[widget.parent.paramSender] = time()
 		end
 
-		local f = GoogleSheetDKP:createTwoDialogFrame(L["Incoming Data"], L["sender has send a dkp change."](sender), L["Accept Sender for 4 hours"], accept, L["Ignore Sender for 4 hours"], ignore)
+		local f = self:createTwoDialogFrame(L["Incoming Data"], L["sender has send a dkp change."](sender), L["Accept Sender for 4 hours"], accept, L["Ignore Sender for 4 hours"], ignore)
 		f.paramData = d["data"]
 		f.paramPrefix = prefix
 		f.paramMessage = message
@@ -122,17 +121,17 @@ end
 
 function GoogleSheetDKP:handleSyncOffer()
 	local storedata = false
-	local sender = GoogleSheetDKP.latestSyncOffer["sender"]
-	local d = GoogleSheetDKP.latestSyncOffer["d"]
+	local sender = self.latestSyncOffer["sender"]
+	local d = self.latestSyncOffer["d"]
 
 	-- if sender is whitelisted and offered data is newer: take it
-	if GoogleSheetDKP.db.profile.acceptSender[sender] and GoogleSheetDKP.db.profile.historytimestamp < d["historytimestamp"] then
-		GoogleSheetDKP:Debug("Received SYNC_OFFER from accepted sender " .. sender .. " with newer data. Will overwrite existing data.")
+	if self.db.profile.acceptSender[sender] and self.db.profile.historytimestamp < d["historytimestamp"] then
+		self:Debug("Received SYNC_OFFER from accepted sender " .. sender .. " with newer data. Will overwrite existing data.")
 		storedata = true
 	end
 
-	if GoogleSheetDKP.latestSyncOfferAccept[sender] then
-		GoogleSheetDKP:Debug("Received SYNC_OFFER from unknown sender " .. sender .. " that was accepted. Will overwrite existing data.")
+	if self.latestSyncOfferAccept[sender] then
+		self:Debug("Received SYNC_OFFER from unknown sender " .. sender .. " that was accepted. Will overwrite existing data.")
 		storedata = true
 	end
 
@@ -140,27 +139,27 @@ function GoogleSheetDKP:handleSyncOffer()
 		-- I am keeping backups... Will be cleaned up when doing a normal manual import
 		-- currently, no options to recover from gui. Use "/dump GoogleSheetDKP.db.profile.backups" and dig in ;)
 		local curtime = time()
-		if not GoogleSheetDKP.db.profile.backups then GoogleSheetDKP.db.profile.backups = {} end
-		GoogleSheetDKP.db.profile.backups[curtime] = {
-			current = GoogleSheetDKP.db.profile.current,
-			history = GoogleSheetDKP.db.profile.history,
-			historytimestamp = GoogleSheetDKP.db.profile.historytimestamp,
-			nexthistory = GoogleSheetDKP.db.profile.nexthistory,
+		if not self.db.profile.backups then self.db.profile.backups = {} end
+		self.db.profile.backups[curtime] = {
+			current = self.db.profile.current,
+			history = self.db.profile.history,
+			historytimestamp = self.db.profile.historytimestamp,
+			nexthistory = self.db.profile.nexthistory,
 		}
 		-- so, let's overwrite
-		GoogleSheetDKP.db.profile.current = d["current"]
-		GoogleSheetDKP.db.profile.history = d["history"]
-		GoogleSheetDKP.db.profile.historytimestamp = d["historytimestamp"]
-		GoogleSheetDKP.db.profile.nexthistory = d["nexthistory"]
+		self.db.profile.current = d["current"]
+		self.db.profile.history = d["history"]
+		self.db.profile.historytimestamp = d["historytimestamp"]
+		self.db.profile.nexthistory = d["nexthistory"]
 
 	else
 
-		GoogleSheetDKP.latestSyncOfferAccept = {}
+		self.latestSyncOfferAccept = {}
 
 		-- else request and handle later
 		local accept = function(widget)
-			GoogleSheetDKP.latestSyncOfferAccept[widget.parent.paramSender] = time()
-			GoogleSheetDKP:handleSyncOffer()
+			self.latestSyncOfferAccept[widget.parent.paramSender] = time()
+			self:handleSyncOffer()
 			widget.parent:Hide()
 		end
 		local decline = function(widget)
@@ -170,11 +169,11 @@ function GoogleSheetDKP:handleSyncOffer()
 
 		local txt = L["sender has offered full DKP list."](sender)
 
-		if GoogleSheetDKP.db.profile.historytimestamp > d["historytimestamp"] then
+		if self.db.profile.historytimestamp > d["historytimestamp"] then
 			txt = txt .. " " .. L["WARNING: DATA IS OLDER THAN EXISTING."]
 		end
 
-		local f = GoogleSheetDKP:createTwoDialogFrame(L["Incoming Data"], txt, L["Accept"], accept, L["Decline"], decline)
+		local f = self:createTwoDialogFrame(L["Incoming Data"], txt, L["Accept"], accept, L["Decline"], decline)
 		f.paramSender = sender
 		f:Show()
 	end
@@ -187,38 +186,38 @@ end
 function GoogleSheetDKP:sendSyncRequest()
 	local commmsg = {
 		command = "SYNC_REQUEST",
-		version = GoogleSheetDKP.commVersion,
-		uuid = GoogleSheetDKP:UUID(),
-		nexthistory = GoogleSheetDKP.db.profile.nexthistory,
-		historytimestamp = GoogleSheetDKP.db.profile.historytimestamp,
+		version = self.commVersion,
+		uuid = self:UUID(),
+		nexthistory = self.db.profile.nexthistory,
+		historytimestamp = self.db.profile.historytimestamp,
 	}
-	GoogleSheetDKP:Debug("send sync request " .. commmsg["uuid"])
-	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
+	self:Debug("send sync request " .. commmsg["uuid"])
+	self:SendCommMessage(self.commPrefix, self:Serialize(commmsg), "RAID", nil, "NORMAL")
 end
 
 function GoogleSheetDKP:sendSyncOffer()
 	local commmsg = {
 		command = "SYNC_OFFER",
-		version = GoogleSheetDKP.commVersion,
-		uuid = GoogleSheetDKP:UUID(),
-		nexthistory = GoogleSheetDKP.db.profile.nexthistory,
-		historytimestamp = GoogleSheetDKP.db.profile.historytimestamp,
-		history = GoogleSheetDKP.db.profile.history,
-		current = GoogleSheetDKP.db.profile.current,
+		version = self.commVersion,
+		uuid = self:UUID(),
+		nexthistory = self.db.profile.nexthistory,
+		historytimestamp = self.db.profile.historytimestamp,
+		history = self.db.profile.history,
+		current = self.db.profile.current,
 	}
-	GoogleSheetDKP:Debug("send sync offer " .. commmsg["uuid"])
-	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
+	self:Debug("send sync offer " .. commmsg["uuid"])
+	self:SendCommMessage(self.commPrefix, self:Serialize(commmsg), "RAID", nil, "NORMAL")
 end
 
 function GoogleSheetDKP:sendChange(data)
-	local latestEntryId = GoogleSheetDKP.db.profile.nexthistory or 0
+	local latestEntryId = self.db.profile.nexthistory or 0
 	local commmsg = {
 		command = "CHANGE",
-		version = GoogleSheetDKP.commVersion,
-		uuid = GoogleSheetDKP:UUID(),
+		version = self.commVersion,
+		uuid = self:UUID(),
 		data = data,
 		timestamp = time()
 	}
-	GoogleSheetDKP:Debug("send sync change " .. commmsg["uuid"])
-	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
+	self:Debug("send sync change " .. commmsg["uuid"])
+	self:SendCommMessage(self.commPrefix, self:Serialize(commmsg), "RAID", nil, "NORMAL")
 end

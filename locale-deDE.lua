@@ -19,9 +19,9 @@ L["Decline"] = "Ablehnen"
 -- core / configs
 
 L["Raid"] = "Raid"
-L["Accept queries for current DKP and list from Raid members"] = "Accept queries for current DKP and list from Raid members"
+L["Accept queries for current DKP and list from Raid members"] = "Raid-Mitglieder dürfen den aktuellen DKP-Stand abfragen"
 L["External"] = "External"
-L["Accept queries for current DKP and list from all users"] = "Accept queries for current DKP and list from all users"
+L["Accept queries for current DKP and list from all users"] = "Alle dürfen den aktuellen DKP-Stand abfragen"
 L["Raid"] = "Raid"
 L["Output DKP changes to Raid"] = "Output DKP changes to Raid"
 L["User"] = "User"
