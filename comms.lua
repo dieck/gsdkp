@@ -100,21 +100,20 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 
 		-- else request and handle later
 		local accept = function(widget)
-			self.db.profile.acceptSender[widget.parent.paramSender] = time()
-			local data = widget.parent.paramData
-			self:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], widget.parent.paramSender)
+			self.db.profile.acceptSender[widget.parent:GetUserData("sender")] = time()
+			local data = widget.parent:GetUserData("data")
+			self:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], widget.parent:GetUserData("sender"))
 		end
 		local ignore = function(widget)
-			self.db.profile.ignoreSender[widget.parent.paramSender] = time()
+			self.db.profile.ignoreSender[widget.parent:GetUserData("sender")] = time()
 		end
 
 		local f = self:createTwoDialogFrame(L["Incoming Data"], L["sender has send a dkp change."](sender), L["Accept Sender for 4 hours"], accept, L["Ignore Sender for 4 hours"], ignore)
-		f.paramData = d["data"]
-		f.paramPrefix = prefix
-		f.paramMessage = message
-		f.paramDistribution = distribution
-		f.paramSender = sender
-		f:Show()
+		f:SetUserData("data", d["data"])
+		f:SetUserData("prefix", prefix)
+		f:SetUserData("message", message)
+		f:SetUserData("distribution", distribution)
+		f:SetUserData("sender", sender)
 	end
 
 end
@@ -158,7 +157,7 @@ function GoogleSheetDKP:handleSyncOffer()
 
 		-- else request and handle later
 		local accept = function(widget)
-			self.latestSyncOfferAccept[widget.parent.paramSender] = time()
+			self.latestSyncOfferAccept[widget.parent:GetUserData("sender")] = time()
 			self:handleSyncOffer()
 			widget.parent:Hide()
 		end
@@ -174,8 +173,7 @@ function GoogleSheetDKP:handleSyncOffer()
 		end
 
 		local f = self:createTwoDialogFrame(L["Incoming Data"], txt, L["Accept"], accept, L["Decline"], decline)
-		f.paramSender = sender
-		f:Show()
+		f:SetUserData("sender", sender)
 	end
 
 
