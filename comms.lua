@@ -22,7 +22,7 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 		return
 	end
 	self.commUUIDseen[d["uuid"]] = time()
-	
+
 	self:Debug("received comm " .. d["uuid"] .. ": " .. d["command"] .. " from " .. sender)
 
 

@@ -2,7 +2,7 @@
 ## Title: GoogleSheetDKP
 ## Notes: Simple interface for using DKP with a google sheet
 ## Author: dieck
-## Version: 20221107
+## Version: 20221123
 ## SavedVariables: GoogleSheetDKPDB
 
 
