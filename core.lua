@@ -318,73 +318,73 @@ GoogleSheetDKP.gsdkpOptionsTable = {
 
 function GoogleSheetDKP:OnInitialize()
 	-- Code that you want to run when the addon is first loaded goes here.
-	self.db = LibStub("AceDB-3.0"):New("GoogleSheetDKPDB", defaults)
+	GoogleSheetDKP.db = LibStub("AceDB-3.0"):New("GoogleSheetDKPDB", defaults)
 
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("GoogleSheetDKP", self.gsdkpOptionsTable)
-	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GoogleSheetDKP", "GoogleSheetDKP")
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("GoogleSheetDKP", GoogleSheetDKP.gsdkpOptionsTable)
+	GoogleSheetDKP.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("GoogleSheetDKP", "GoogleSheetDKP")
 
-	self.onetimes = {}
+	GoogleSheetDKP.onetimes = {}
 
 	-- change default output language if configured
-	if self.outputLocales[self.db.profile.outputlanguage] ~= nil then
-		for k,v in pairs(self.outputLocales[self.db.profile.outputlanguage]) do L[k] = v end
+	if GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage] ~= nil then
+		for k,v in pairs(GoogleSheetDKP.outputLocales[GoogleSheetDKP.db.profile.outputlanguage]) do L[k] = v end
 	end
 
-	if self.db.profile.nexthistory == nil then self.db.profile.nexthistory = 1 end
-	if self.db.profile.historytimestamp == nil then self.db.profile.historytimestamp = 0 end
-	if self.db.profile.history == nil then self.db.profile.history = {} end
-	if self.db.profile.current == nil then self.db.profile.current = {} end
+	if GoogleSheetDKP.db.profile.nexthistory == nil then GoogleSheetDKP.db.profile.nexthistory = 1 end
+	if GoogleSheetDKP.db.profile.historytimestamp == nil then GoogleSheetDKP.db.profile.historytimestamp = 0 end
+	if GoogleSheetDKP.db.profile.history == nil then GoogleSheetDKP.db.profile.history = {} end
+	if GoogleSheetDKP.db.profile.current == nil then GoogleSheetDKP.db.profile.current = {} end
 
 	-- for "later" option, will be compared against time()
-	self.attendancereminder = 0
+	GoogleSheetDKP.attendancereminder = 0
 
-	if self.db.profile.raidattendance_taken == nil then self.db.profile.raidattendance_taken = 0 end
+	if GoogleSheetDKP.db.profile.raidattendance_taken == nil then GoogleSheetDKP.db.profile.raidattendance_taken = 0 end
 
 	-- remove stored attendance if older than 12 hours
-	if self.db.profile.raidattendance_taken + 12*60*60 < time() then
-		self.db.profile.raidattendance = nil
-		self.db.profile.raidattendance_taken = 0
+	if GoogleSheetDKP.db.profile.raidattendance_taken + 12*60*60 < time() then
+		GoogleSheetDKP.db.profile.raidattendance = nil
+		GoogleSheetDKP.db.profile.raidattendance_taken = 0
 	end
 
-	if not self.db.profile.ignoreSender then self.db.profile.ignoreSender = {} end
-	if not self.db.profile.acceptSender then self.db.profile.acceptSender = {} end
+	if not GoogleSheetDKP.db.profile.ignoreSender then GoogleSheetDKP.db.profile.ignoreSender = {} end
+	if not GoogleSheetDKP.db.profile.acceptSender then GoogleSheetDKP.db.profile.acceptSender = {} end
 
-	self.latestSyncOfferTime = 0
-	self.latestSyncOfferAccept = {}
+	GoogleSheetDKP.latestSyncOfferTime = 0
+	GoogleSheetDKP.latestSyncOfferAccept = {}
 
-	self.commUUIDseen = {}
+	GoogleSheetDKP.commUUIDseen = {}
 end
 
 function GoogleSheetDKP:OnEnable()
 	-- Called when the addon is enabled
 
 	-- interaction from raid members
-	self:RegisterEvent("CHAT_MSG_WHISPER")
-	self:RegisterEvent("PLAYER_LOGOUT")
+	GoogleSheetDKP:RegisterEvent("CHAT_MSG_WHISPER")
+	GoogleSheetDKP:RegisterEvent("PLAYER_LOGOUT")
 
-	self:RegisterChatCommand("gsdkp", "ChatCommand")
+	GoogleSheetDKP:RegisterChatCommand("gsdkp", "ChatCommand")
 
-	self:RegisterComm(self.commPrefix, "OnCommReceived")
-	self:RegisterComm(self.commPrefixCSLS, "OnCommReceivedCSLS")
+	GoogleSheetDKP:RegisterComm(GoogleSheetDKP.commPrefix, "OnCommReceived")
+	GoogleSheetDKP:RegisterComm(GoogleSheetDKP.commPrefixCSLS, "OnCommReceivedCSLS")
 
-	if not self.db.profiles.properlyEnded then
-		self:Debug("Error: not properly ended. Will request information")
-		self:askToRequestSyncCrash()
+	if not GoogleSheetDKP.db.profiles.properlyEnded then
+		GoogleSheetDKP:Debug("Error: not properly ended. Will request information")
+		GoogleSheetDKP:askToRequestSyncCrash()
 	end
-	self.db.profiles.properlyEnded = false
+	GoogleSheetDKP.db.profiles.properlyEnded = false
 end
 
 function GoogleSheetDKP:OnDisable()
     -- Called when the addon is disabled
-	self:UnregisterEvent("CHAT_MSG_WHISPER")
-	self:UnregisterEvent("PLAYER_LOGOUT")
-	self:UnregisterAllComm()
+	GoogleSheetDKP:UnregisterEvent("CHAT_MSG_WHISPER")
+	GoogleSheetDKP:UnregisterEvent("PLAYER_LOGOUT")
+	GoogleSheetDKP:UnregisterAllComm()
 end
 
 function GoogleSheetDKP:PLAYER_LOGOUT()
 	-- event is called just before variables are saved
 	-- and we need this variable to be saved ;)
-	self.db.profiles.properlyEnded = true
+	GoogleSheetDKP.db.profiles.properlyEnded = true
 end
 
 function GoogleSheetDKP:ChatCommand(inc)
@@ -394,7 +394,7 @@ function GoogleSheetDKP:ChatCommand(inc)
 		return true
 
 	elseif strtrim(inc) == "" then
-		self.dkpframe = self:createDKPFrame()
+		GoogleSheetDKP.dkpframe = GoogleSheetDKP:createDKPFrame()
 		return true
 
 	else
@@ -407,31 +407,31 @@ function GoogleSheetDKP:ChatCommand(inc)
 			return false
 
 		elseif cmd == "action" then
-			self.actionframe = self:createActionFrame()
+			GoogleSheetDKP.actionframe = GoogleSheetDKP:createActionFrame()
 			return true
 
 		elseif cmd == "item" then
 			local _, name, change, item = strsplit(" ", incs, 4)
-			self:Item(name, change, item)
+			GoogleSheetDKP:Item(name, change, item)
 			return true
 
 		elseif cmd == "init" or cmd == "raidinit" then
-			self:RaidInit()
+			GoogleSheetDKP:RaidInit()
 			return true
 
 		elseif cmd == "raid" or cmd == "raidchange" then
 			local _, change, cause, comment = strsplit(" ", incs, 4)
-			self:RaidChange(change, cause, comment)
+			GoogleSheetDKP:RaidChange(change, cause, comment)
 			return true
 
 		elseif cmd == "attendance" or cmd == "attend" then
 			local _, deletion = strsplit(" ", incs, 2)
-			self:Attendance(deletion)
+			GoogleSheetDKP:Attendance(deletion)
 			return true
 
 		elseif cmd == "change" then
 			local _, name, change, cause, comment = strsplit(" ", incs, 5)
-			self:Change(name, change, cause, comment)
+			GoogleSheetDKP:Change(name, change, cause, comment)
 			return true
 
 		end
@@ -443,8 +443,8 @@ end
 
 
 function GoogleSheetDKP:Debug(t)
-	if (self.db.profile.debug) then
-		self:Print("GoogleSheetDKP DEBUG: " .. t)
+	if (GoogleSheetDKP.db.profile.debug) then
+		GoogleSheetDKP:Print("GoogleSheetDKP DEBUG: " .. t)
 	end
 end
 

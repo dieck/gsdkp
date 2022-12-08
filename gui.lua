@@ -4,8 +4,8 @@ local AceGUI = LibStub("AceGUI-3.0")
 GoogleSheetDKP.dkpframe = nil
 
 function GoogleSheetDKP:createDKPFrame()
-	if self.db.profile.current == nil then
-		self:Print(L["No current DKP information."])
+	if GoogleSheetDKP.db.profile.current == nil then
+		GoogleSheetDKP:Print(L["No current DKP information."])
 		return;
 	end
 
@@ -409,8 +409,8 @@ function GoogleSheetDKP:ActionFrameTab_master(container)
 		local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
 		raiderlist[name] = name
 
-		if self.db.profile.current[name] then
-			raiderlist[name] = name .. " (" .. self.db.profile.current[name] .. ")"
+		if GoogleSheetDKP.db.profile.current[name] then
+			raiderlist[name] = name .. " (" .. GoogleSheetDKP.db.profile.current[name] .. ")"
 		end
 	end
 
@@ -522,21 +522,21 @@ function GoogleSheetDKP:executeActionFrameAction()
 	local res = nil
 
 	if actionFrameAction == 'raidinit' then
-		res = self:RaidInit()
+		res = GoogleSheetDKP:RaidInit()
 	elseif actionFrameAction == 'raidchange' then
-		res = self:RaidChange(actionFrameDKP, actionFrameCause, actionFrameComment)
+		res = GoogleSheetDKP:RaidChange(actionFrameDKP, actionFrameCause, actionFrameComment)
 	elseif actionFrameAction == 'item' then
-		res = self:Item(actionFrameUser, actionFrameDKP, actionFrameComment)
+		res = GoogleSheetDKP:Item(actionFrameUser, actionFrameDKP, actionFrameComment)
 	elseif actionFrameAction == 'attendance' then
 		if actionFrameDeletion then
-			res = self:Attendance("delete")
+			res = GoogleSheetDKP:Attendance("delete")
 		else
-			res = self:Attendance()
+			res = GoogleSheetDKP:Attendance()
 		end
 	else --elseif actionFrameAction == 'change' then
-		res = self:Change(actionFrameUser, actionFrameDKP, actionFrameCause, actionFrameComment)
+		res = GoogleSheetDKP:Change(actionFrameUser, actionFrameDKP, actionFrameCause, actionFrameComment)
 	end
 
-	if res then self.actionframe:Hide() end
+	if res then GoogleSheetDKP.actionframe:Hide() end
 end
 
