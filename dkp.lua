@@ -327,7 +327,7 @@ function GoogleSheetDKP:Change(name, change, cause, comment, silent, dt, tm, com
 		end
 
 		-- if it didn't come in by comms, send out by comms
-		GoogleSheetDKP:sendChange(newhistory)
+		GoogleSheetDKP:sendChange(newhistory, newdkp)
 	end
 
 	GoogleSheetDKP.db.profile.nexthistory = GoogleSheetDKP.db.profile.nexthistory + 1

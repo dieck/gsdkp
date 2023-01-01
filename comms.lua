@@ -95,6 +95,16 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 			GoogleSheetDKP:Debug("Received CHANGE from accepted users, will enter.")
 			local data = d["data"]
 			GoogleSheetDKP:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], sender)
+
+			-- validate dkp:
+			if d["newdkp"] ~= nil then
+				local playerdkp = GoogleSheetDKP:GetDKP(data["name"])
+				if tonumber(playerdkp) ~= tonumber(d["newdkp"]) then
+					GoogleSheetDKP:Print("Something is wrong with my data. " .. data["name"] .. " is supposed to have " .. d["newdkp"] .. " dkp, but actually has " .. playerdkp .. ". Will request Sync.")
+					GoogleSheetDKP:sendSyncRequest()
+				end
+			end
+
 			return
 		end
 
@@ -103,9 +113,21 @@ function GoogleSheetDKP:OnCommReceived(prefix, message, distribution, sender)
 			GoogleSheetDKP.db.profile.acceptSender[widget.parent:GetUserData("sender")] = time()
 			local data = widget.parent:GetUserData("data")
 			GoogleSheetDKP:Change(data["name"], data["change"], data["cause"], data["comment"], data["silent"], data["date"], data["time"], widget.parent:GetUserData("sender"))
+
+			-- validate dkp:
+			if d["newdkp"] ~= nil then
+				local playerdkp = GoogleSheetDKP:GetDKP(data["name"])
+				if tonumber(playerdkp) ~= tonumber(d["newdkp"]) then
+					GoogleSheetDKP:Print("Something is wrong with my data. " .. data["name"] .. " is supposed to have " .. d["newdkp"] .. " dkp, but actually has " .. playerdkp .. ". Will request Sync.")
+					GoogleSheetDKP:sendSyncRequest()
+				end
+			end
+
+			widget.parent:Hide()
 		end
 		local ignore = function(widget)
 			GoogleSheetDKP.db.profile.ignoreSender[widget.parent:GetUserData("sender")] = time()
+			widget.parent:Hide()
 		end
 
 		local f = GoogleSheetDKP:createTwoDialogFrame(L["Incoming Data"], L["sender has send a dkp change."](sender), L["Accept Sender for 4 hours"], accept, L["Ignore Sender for 4 hours"], ignore)
@@ -207,14 +229,15 @@ function GoogleSheetDKP:sendSyncOffer()
 	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
 end
 
-function GoogleSheetDKP:sendChange(data)
+function GoogleSheetDKP:sendChange(data, newdkp)
 	local latestEntryId = GoogleSheetDKP.db.profile.nexthistory or 0
 	local commmsg = {
 		command = "CHANGE",
 		version = GoogleSheetDKP.commVersion,
 		uuid = GoogleSheetDKP:UUID(),
 		data = data,
-		timestamp = time()
+		timestamp = time(),
+		newdkp = newdkp,
 	}
 	GoogleSheetDKP:Debug("send sync change " .. commmsg["uuid"])
 	GoogleSheetDKP:SendCommMessage(GoogleSheetDKP.commPrefix, GoogleSheetDKP:Serialize(commmsg), "RAID", nil, "NORMAL")
